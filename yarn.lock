@@ -831,13 +831,6 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.6.tgz#628effeeae2064a1b4e79f78e81d87b7e5fc7b50"
   integrity sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==
 
-"@types/firebase@^3.2.3":
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/@types/firebase/-/firebase-3.2.3.tgz#95972e34a844603ac171222842ee84d8759d4757"
-  integrity sha512-fId22ajZ7CkTMnm/FveFcEGb7Trv97JsUk1Dvc1vIFDiwpVSGKeTUyBOA2Tr2riXe53ZP526G9WDCrq3ulE7tw==
-  dependencies:
-    firebase "*"
-
 "@types/json-schema@^7.0.15":
   version "7.0.15"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
@@ -1849,7 +1842,7 @@ find-up@^5.0.0:
     locate-path "^6.0.0"
     path-exists "^4.0.0"
 
-firebase@*, firebase@^11.1.0:
+firebase@^11.1.0:
   version "11.1.0"
   resolved "https://registry.yarnpkg.com/firebase/-/firebase-11.1.0.tgz#7fce26e8220f9490bf2a32469b7c5034462024c2"
   integrity sha512-3OoNW3vBXmBLYJvcwbPCwfluptbDVp2zZYjrfHPVFAXfPgmyy/LWjidt+Sw2WNvRelsG0v++WN2Wor6J3OwDRg==
