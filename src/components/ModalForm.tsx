@@ -8,7 +8,7 @@ import { TimeSlot } from '@/util/availability';
 interface ModalFormProps {
   show: boolean;
   selectedSlot: TimeSlot;
-  token: String;
+  token: string;
   onClose: () => void;
 }
 

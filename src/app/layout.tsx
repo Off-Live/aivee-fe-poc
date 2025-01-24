@@ -2,7 +2,7 @@
 import { AuthProvider } from '@/context/AuthContext';
 import '../styles/globals.css';
 
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 
 export const metadata = {
   title: 'Calendar Scheduling Example',
@@ -10,12 +10,16 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
+
     <AuthProvider>
-    <html lang="ko">
-      <body>
-        {children}
-      </body>
-    </html>
+      <html lang="ko">
+        <Suspense>
+          <body>
+            {children}
+          </body>
+        </Suspense>
+      </html>
     </AuthProvider>
+
   );
 }

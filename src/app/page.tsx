@@ -8,63 +8,63 @@ import ViewToggle from '@/components/ViewToggle';
 import WeeklyView from '@/components/WeeklyView';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useMonthlyEvents} from '@/util/calendar';
+import { useMonthlyEvents } from '@/util/calendar';
 import { useSearchParams } from 'next/navigation';
 import ModalForm from '@/components/ModalForm';
 import { AvailabilityResponse, TimeSlot, transformDates } from '@/util/availability';
 
- 
+
 
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [selectedSlot, setSelectedSlot] = useState<TimeSlot>({startDate:new Date(),endDate:new Date()})
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot>({ startDate: new Date(), endDate: new Date() })
   const [view, setView] = useState<'monthly' | 'weekly'>('monthly');
   const [initLoading, setInitLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
   const [availability, setAvailability] = useState<TimeSlot[]>([])
   const [showModal, setShowModal] = useState(false);
-  
+
 
   const { credential } = useAuth();
-  const {monthlyEvents, loading} = useMonthlyEvents(credential?.accessToken, selectedDate)
+  const { monthlyEvents, loading } = useMonthlyEvents(credential?.accessToken, selectedDate)
 
   const param = useSearchParams();
   const token = param.get('token');
 
-  useEffect(()=> {
-    const getAvailabilitySlots = async ()=>{
+  useEffect(() => {
+    const getAvailabilitySlots = async () => {
       try {
         const response = await fetch(`https://be-dev.aivee.xyz/availability/slots?token=${token}`)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
-        
+
         }
 
         const json = await response.json() as AvailabilityResponse
         const availabilityData = transformDates(json as AvailabilityResponse);
         console.log(availabilityData.availabilities)
-        
+
         setAvailability(availabilityData.availabilities)
         setInitLoading(false)
         setAuthorized(true)
-      }catch(error){
+      } catch (error) {
         setInitLoading(false)
         setAuthorized(false)
       }
 
     }
     const date = param.get('beginDate') as string;
-    console.log( `date : ${date}`)
-    if (date != null) { 
+    console.log(`date : ${date}`)
+    if (date != null) {
       setSelectedDate(new Date(date))
     }
     getAvailabilitySlots()
 
-  }, [])
+  }, [param, token])
 
-  const selectSlot = (start:Date, end:Date) => {
-    setSelectedSlot({startDate:start, endDate:end})
+  const selectSlot = (start: Date, end: Date) => {
+    setSelectedSlot({ startDate: start, endDate: end })
     setShowModal(true)
     console.log("select slot")
   }
@@ -91,7 +91,7 @@ export default function HomePage() {
     ) : (
       <>
         <h1>Weekly View</h1>
-        <WeeklyView events={monthlyEvents} currentDate={selectedDate} availability={availability} setCurrentDate={setSelectedDate} selectSlot={selectSlot}/>
+        <WeeklyView events={monthlyEvents} currentDate={selectedDate} availability={availability} setCurrentDate={setSelectedDate} selectSlot={selectSlot} />
       </>
     )}
   </>
@@ -99,17 +99,17 @@ export default function HomePage() {
   const unauthorizedMain = "Not valid token"
   const loadingScreen = "loading"
 
-  const content = initLoading ? loadingScreen : (authorized ? authorizedMain: unauthorizedMain)
-  
+  const content = initLoading ? loadingScreen : (authorized ? authorizedMain : unauthorizedMain)
+
 
   return (
     <div className="container">
       <Sidebar />
       <div className="main">
         {content}
-        
+
       </div>
-     
+
       <ModalForm show={showModal} selectedSlot={selectedSlot} token={token!} onClose={() => setShowModal(false)} />
 
     </div>
