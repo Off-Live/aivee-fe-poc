@@ -73,6 +73,10 @@ body {
   background-color: #3f3fff;
 }
 
+.calendarDay.valid {
+  background-color: rgb(225, 191, 191);
+}
+
 .times {
   background-color: #1e1e1e;
   padding: 16px;
@@ -144,7 +148,7 @@ body {
 .weekly-grid-body {
   display: grid;
   grid-template-columns: 80px repeat(7, 1fr);
-  grid-auto-rows: 60px; /* 예시: 각 시간 간격 높이 */
+  grid-auto-rows: 30px; /* 예시: 각 시간 간격 높이 */
   max-height: 80vh;  /* 스크롤 예시 */
   overflow-y: auto;
   position: relative;
@@ -163,10 +167,15 @@ body {
 /* 실제 스케줄 셀(요일 x 시간) */
 .weekly-cell {
   border-right: 1px solid #333;
-  border-bottom: 1px solid #333;
+  border-bottom: none;
   position: relative;
   cursor: pointer;
-  width:150px
+  width:150px;
+  cursor:default;
+}
+
+.weekly-cell.hour-line {
+  border-bottom: 1px solid #333;
 }
 
 .time-label {
@@ -178,10 +187,10 @@ body {
   color: #fff;
 }
 
-/* 마우스오버 효과 등 */
+/* 마우스오버 효과 등
 .weekly-cell:hover {
   background-color: #2a2a2a;
-}
+} */
 
 /* 예시: 블록된 부분(빗금 패턴)을 표현하고 싶다면 */
 .blocked {
@@ -192,6 +201,30 @@ body {
     transparent 10px,
     transparent 20px
   );
+}
+
+.weekly-cell:not(.blocked) {
+  cursor: pointer; /* Pointer cursor for available cells */
+}
+
+
+/* Hover effect for available cells */
+.weekly-cell:not(.blocked):hover::before {
+  content: attr(data-time);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(63, 63, 255, 0.3);
+  border: 2px solid #3f3fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+  z-index: 20;
 }
 
 /* 현재 시간선 (수평 라인) 표현용 */
@@ -209,6 +242,16 @@ body {
   background-color: #3f3fff;
   border-radius: 6px;
   opacity: 0.9;
+  color: #fff;
+  padding: 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.available-slot {
+  background-color: #4b4b59;
+  border-radius: 6px;
+  opacity: 0.3;
   color: #fff;
   padding: 4px;
   box-sizing: border-box;

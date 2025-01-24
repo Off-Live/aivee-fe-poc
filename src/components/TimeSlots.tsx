@@ -1,26 +1,31 @@
 // components/TimeSlots.tsx
-import React, { useState } from 'react';
+
+import { checkAvailability, TimeSlot } from '@/util/availability';
+import { useEffect, useState } from 'react';
+
 
 type TimeSlotsProps = {
   selectedDate: Date;
+  availability: TimeSlot[];
+  selectSlot:(start:Date, end:Date) => void;
 };
 
-export default function TimeSlots({ selectedDate }: TimeSlotsProps) {
+export default function TimeSlots({ selectedDate, availability, selectSlot }: TimeSlotsProps) {
   const [is24Hour, setIs24Hour] = useState(true);
 
-  // For example , 15:00 ~ 19:00, 30min for each slot
-  const times = [
-    15, 15.5, 16, 16.5, 17, 17.5, 18, 18.5, 19,
-  ];
+  const times = Array.from({ length: 48 }, (_, i) => i * 0.5);
 
-  const toggleFormat = () => {
-    setIs24Hour((prev) => !prev);
-  };
-
+  
   const handleTimeClick = (time: number) => {
-    const hour = Math.floor(time);
-    const minute = (time - hour) === 0.5 ? 30 : 0;
-    console.log(`Selected Time: ${selectedDate.toDateString()} ${hour}:${minute === 0 ? '00' : '30'}`);
+    const hours = Math.floor(time);
+    const minutes = (time % 1) * 60;
+    
+    const start = new Date(selectedDate);
+    start.setHours(hours, minutes, 0, 0);
+    
+    const end = new Date(start);
+    end.setMinutes(minutes + 30);
+    selectSlot(start, end)
   };
 
   const formatTime = (time: number): string => {
@@ -39,21 +44,25 @@ export default function TimeSlots({ selectedDate }: TimeSlotsProps) {
 
   return (
     <div className="times">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-        <h3>{`${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`}</h3>
-        <button onClick={toggleFormat}>
-          {is24Hour ? '12h' : '24h'}
-        </button>
-      </div>
-      {times.map((time, idx) => (
-        <div
-          key={idx}
-          className="timeItem"
-          onClick={() => handleTimeClick(time)}
-        >
-          {formatTime(time)}
-        </div>
-      ))}
+        <h3 style = {{textAlign:'center'}}>{`${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`}</h3>
+        
+      
+      {times.map((time, idx) => {
+        if (checkAvailability(selectedDate, time, availability)) {
+          return (<div
+            key={idx}
+            className="timeItem"
+            onClick={() => handleTimeClick(time)}
+          >
+            {formatTime(time)}
+          </div>)
+        } else {
+          return null
+        }
+
+      })}
+
     </div>
   );
 }
+

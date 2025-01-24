@@ -1,6 +1,7 @@
 // components/WeeklyView.tsx
 'use client';
 
+import { TimeSlot,checkAvailability } from '@/util/availability';
 import { CalendarEvent } from '@/util/calendar';
 import React, { useEffect, useState } from 'react';
 
@@ -21,11 +22,19 @@ function getWeekRange(date: Date) {
 type WeeklyViewProps = {
   events:CalendarEvent[];
   currentDate:Date;
+  availability:TimeSlot[];
   setCurrentDate:(date: Date) => void;
+  selectSlot:(start:Date, end:Date) => void;
 };
 
+const formatTime = (time: number) => {
+  const adjustedTime = ((time % 24) + 24) % 24; // Handle negative/over 24h
+  const hours = Math.floor(adjustedTime);
+  const minutes = (adjustedTime % 1) * 60;
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+};
 
-export default function WeeklyView( {events, currentDate, setCurrentDate}: WeeklyViewProps ) {
+export default function WeeklyView( {events, currentDate,availability, setCurrentDate, selectSlot}: WeeklyViewProps ) {
   const [weekDays, setWeekDays] = useState<Date[]>([]);
 
   useEffect(() => {
@@ -44,6 +53,19 @@ export default function WeeklyView( {events, currentDate, setCurrentDate}: Weekl
     setCurrentDate(newDate);
   };
 
+  const handleCellClick = (day: Date, time: number) => {
+    const hours = Math.floor(time);
+    const minutes = (time % 1) * 60;
+    
+    const start = new Date(day);
+    start.setHours(hours, minutes, 0, 0);
+    
+    const end = new Date(start);
+    end.setMinutes(minutes + 30);
+  
+    selectSlot(start, end)
+  };
+
   // Date range string (e.g., 1/14 - 1/20, 2025)
   const start = weekDays[0];
   const end = weekDays[6];
@@ -53,7 +75,7 @@ export default function WeeklyView( {events, currentDate, setCurrentDate}: Weekl
       : '';
 
   
-  const times = Array.from({ length: 25 }, (_, i) => i); 
+  const times = Array.from({ length: 50 }, (_, i) => i*0.5 - 0.5); 
 
   // (Optional) Calculate current time position in pixels within the grid
   // This is just for demo (real-time calculation needed)
@@ -87,6 +109,11 @@ export default function WeeklyView( {events, currentDate, setCurrentDate}: Weekl
     const startDate = new Date(event.start.dateTime);
     const endDate = new Date(event.end.dateTime);
 
+    return getTimeSlotPositionStyle(startDate, endDate)
+  };
+
+  const getTimeSlotPositionStyle = (startDate:Date, endDate:Date) => {
+
     // 1) Check if event is within this week's range
     //    If startDate or endDate is outside the week range, ignore for now (simplified).
     //    For more accurate handling, we could add logic to calculate overlapping portions.
@@ -106,8 +133,8 @@ export default function WeeklyView( {events, currentDate, setCurrentDate}: Weekl
     //    Calculate minutes from start of day and use as top/height
     const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
     const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
-    const top = startMinutes; // 1px = 1min
-    const height = Math.max(endMinutes - startMinutes, 15)-10; 
+    const top = startMinutes + 30; 
+    const height = Math.max(endMinutes - startMinutes, 15)-5; 
     // Show at least 15px (for very short events)
 
     return {
@@ -117,7 +144,8 @@ export default function WeeklyView( {events, currentDate, setCurrentDate}: Weekl
       width: '145px',
       height: `${height}px`,
     };
-  };
+  }
+  
 
 
   return (
@@ -156,18 +184,22 @@ export default function WeeklyView( {events, currentDate, setCurrentDate}: Weekl
             <React.Fragment key={`row-${t}`}>
               {/* Time cell */}
               <div className="weekly-time-cell">
-              <span className="time-label">{t.toString().padStart(2, '0')}:00</span>
+              <span className="time-label">
+                {t % 1 === 0 && `${Math.floor(t).toString().padStart(2, '0')}:00`}
+              </span>
               </div>
 
               {/* 7 days x 1 hour each */}
               {weekDays.map((day, idx) => {
-                // Example: block 12-14 hours randomly etc.
-                const isBlocked = (t >= 11 && t < 14 && idx === 1) ||
-                                  (t >= 14 && t < 18 && idx === 2);
+                const isAvailable = checkAvailability(day, t, availability)
+                const startTime = t;
+                const endTime = t + 0.5;
                 return (
                   <div
                     key={`cell-${t}-${idx}`}
-                    className={`weekly-cell ${isBlocked ? 'blocked' : ''}`}
+                    className={`weekly-cell ${t%1===0 ? '':'hour-line'} ${isAvailable ? '' : 'blocked'}`}
+                    data-time={`${formatTime(startTime)} - ${formatTime(endTime)}`}
+                    onClick={isAvailable ? () => handleCellClick(day, t) : undefined} 
                   >
                     {/* Add content (events, reservations) here if needed */}
                   </div>

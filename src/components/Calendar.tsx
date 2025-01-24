@@ -1,24 +1,22 @@
 // components/Calendar.tsx
 'use client';
 
+import { hasAvailabilityOnDate, TimeSlot } from '@/util/availability';
 import React, { useState } from 'react';
 
 type CalendarProps = {
-  selectedDate: Date;                   // Selected date passed from parent component
-  onDateChange: (date: Date) => void;   // Callback to notify parent when date is clicked
+  selectedDate: Date;              
+  availability: TimeSlot[];
+  onDateChange: (date: Date) => void;   
 };
 
-export default function Calendar({ selectedDate, onDateChange }: CalendarProps) {
-  // Manage current year/month as state (default value based on selectedDate)
+export default function Calendar({ selectedDate, availability, onDateChange }: CalendarProps) {
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [month, setMonth] = useState(selectedDate.getMonth()); // 0=Jan, 1=Feb, ...
 
-  // 1) Get what day of the week is the 1st of the month
   const firstDayOfMonth = new Date(year, month, 1).getDay(); 
-  // 2) Get how many days are in this month
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Create array of days to display in calendar (from 1 to daysInMonth)
   const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   // When previous month button is clicked
@@ -85,11 +83,12 @@ export default function Calendar({ selectedDate, onDateChange }: CalendarProps) 
           // Compare with selected date
           const isSelected =
             currentDate.toDateString() === selectedDate.toDateString();
-
+          const isAvailable = 
+            hasAvailabilityOnDate(currentDate,availability)
           return (
             <div
               key={day}
-              className={`calendarDay ${isSelected ? 'selected' : ''}`}
+              className={`calendarDay ${isSelected ? 'selected' : isAvailable? 'valid' : ''}`}
               onClick={() => handleDayClick(day)}
             >
               {day}
