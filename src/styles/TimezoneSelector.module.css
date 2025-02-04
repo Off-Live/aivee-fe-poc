@@ -1,0 +1,51 @@
+.selectWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.select {
+  width: 100%;
+  padding: 8px 32px 8px 16px;
+  background-color: #374151;
+  border: 1px solid #474849;
+  border-radius: 8px;
+    
+  appearance: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.select:hover {
+  border-color: #3b82f6;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+/* 옵션 스타일링 */
+.select option {
+  padding: 8px;
+  background-color: #ffffff;
+  color: #374151;
+}
+
+.select option:hover {
+  background-color: #f3f4f6;
+}

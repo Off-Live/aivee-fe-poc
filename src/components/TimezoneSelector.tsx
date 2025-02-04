@@ -2,6 +2,7 @@
 import React from 'react';
 import moment from 'moment-timezone';
 import { useTimezone } from '@/context/TimezoneContext';
+import styles from '@/styles/TimezoneSelector.module.css'
 
 const TimezoneSelector = () => {
   // Context 훅을 통해 state와 setter를 받아옴
@@ -15,12 +16,13 @@ const TimezoneSelector = () => {
   };
 
   return (
-    <div>
-      <label htmlFor="timezone-select">시간대 선택: </label>
+    <div className={styles.selectWrapper}>
+      
       <select
         id="timezone-select"
         value={selectedTimezone}
         onChange={handleChange}
+        className={styles.select}
       >
         {timezones.map((tz) => (
           <option key={tz} value={tz}>
@@ -28,7 +30,18 @@ const TimezoneSelector = () => {
           </option>
         ))}
       </select>
-      <p>선택한 시간대: {selectedTimezone}</p>
+      <div className={styles.arrow}>
+        <svg
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
     </div>
   );
 };

@@ -3,6 +3,7 @@
 import { TimeSlot } from '@/util/availability';
 import React from 'react';
 import Calendar from './Calendar';
+import TimezoneSelector from './TimezoneSelector';
 
 type SidebarProps = {
   selectedDate: Date;              
@@ -19,7 +20,7 @@ export default function Sidebar({ selectedDate, availability, onDateChange }: Si
       <h2 style={{ margin: '8px 0' }}>Availability</h2>
       
       
-      <p>Asia/Seoul</p>
+      <TimezoneSelector/>
 
       <Calendar
        
