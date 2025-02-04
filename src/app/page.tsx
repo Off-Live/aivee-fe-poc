@@ -35,7 +35,7 @@ export default function HomePage() {
   useEffect(() => {
     const getAvailabilitySlots = async () => {
       try {
-        const response = await fetch(`https://be-dev.aivee.xyz/availability/slots?token=${token}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_AIVEE_BACKEND}/availability/slots?token=${token}`)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
 
