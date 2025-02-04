@@ -6,12 +6,17 @@ export interface TimeSlot {
 }
 
 export interface AvailabilityResponse {
+  email: string;
+  name: string;
+  beginDate: Date;
+  endDate: Date;
   availabilities: TimeSlot[];
   scheduled: TimeSlot[];
 }
 
 export const transformDates = (data: AvailabilityResponse): AvailabilityResponse => {
   return {
+    ...data,
     availabilities: data.availabilities.map(slot => ({
       startDate: new Date(slot.startDate),
       endDate: new Date(slot.endDate)
@@ -19,7 +24,9 @@ export const transformDates = (data: AvailabilityResponse): AvailabilityResponse
     scheduled: data.scheduled.map(slot => ({
       startDate: new Date(slot.startDate), 
       endDate: new Date(slot.endDate)
-    }))
+    })),
+    beginDate: new Date(data.beginDate),
+    endDate: new Date(data.endDate)
   };
  };
 
