@@ -73,7 +73,7 @@ export default function HomePage() {
 
   const authorizedMain = <>
 
-  <div style={{ position: 'absolute', top: '24px', right: '150px' }}>
+    <div style={{ position: 'absolute', top: '24px', right: '150px' }}>
       <GoogleAuth/>
     </div>
     

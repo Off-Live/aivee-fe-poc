@@ -8,16 +8,16 @@ const GoogleAuth = () => {
   const { user, signInWithGoogle, logout } = useAuth();
 
   const profileImage = (
-    <div className={styles['profile-container']}>
+    <div className={styles['profile-image-container']}>
       {user?.photoURL != null ? (<img className={styles['profile-image']} src={user?.photoURL}/>): (null)}
     </div>
 
   )
 
   return (
-    <div>
+    <div className={styles['container']}>
       {user ? (
-        <div className={styles.container}>
+        <div className={styles['profile-container']}>
           {user?.photoURL != null ? (profileImage): (null)}
           <p>{user.displayName} </p>
           <div style={{width:'20px'}}/>
