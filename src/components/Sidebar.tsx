@@ -1,9 +1,17 @@
 
 // components/Sidebar.tsx
+import { TimeSlot } from '@/util/availability';
 import React from 'react';
-import GoogleAuth from './GoogleAuth';
+import Calendar from './Calendar';
 
-export default function Sidebar() {
+type SidebarProps = {
+  selectedDate: Date;              
+  availability: TimeSlot[];
+  onDateChange: (date: Date) => void;   
+};
+
+
+export default function Sidebar({ selectedDate, availability, onDateChange }: SidebarProps) {
   return (
     <div className = "sidebar">
       
@@ -12,7 +20,15 @@ export default function Sidebar() {
       
       
       <p>Asia/Seoul</p>
-      <GoogleAuth/>
+
+      <Calendar
+       
+       selectedDate={selectedDate}
+       availability={availability}
+       onDateChange={onDateChange}
+       width={340}
+      />
+      
     </div>
   );
 }

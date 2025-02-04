@@ -11,6 +11,7 @@ type TimeSlotsProps = {
 };
 
 export default function TimeSlots({ selectedDate, availability, selectSlot }: TimeSlotsProps) {
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const [is24Hour, setIs24Hour] = useState(true);
 
   const times = Array.from({ length: 48 }, (_, i) => i * 0.5);
@@ -44,7 +45,7 @@ export default function TimeSlots({ selectedDate, availability, selectSlot }: Ti
 
   return (
     <div className="times">
-        <h3 style = {{textAlign:'center'}}>{`${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`}</h3>
+        <h3 style = {{textAlign:'left'}}>{`${selectedDate.getMonth() + 1}/${selectedDate.getDate()} ${weekdays[selectedDate.getDay()]}`}</h3>
         
       
       {times.map((time, idx) => {

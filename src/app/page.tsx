@@ -1,7 +1,7 @@
 // app/page.tsx
 'use client';
 
-import Sidebar from '@/components/Sidebar';
+import InfoPanel from '@/components/InfoPanel';
 import Calendar from '@/components/Calendar';
 import TimeSlots from '@/components/TimeSlots';
 import ViewToggle from '@/components/ViewToggle';
@@ -12,6 +12,8 @@ import { useMonthlyEvents } from '@/util/calendar';
 import { useSearchParams } from 'next/navigation';
 import ModalForm from '@/components/ModalForm';
 import { AvailabilityResponse, TimeSlot, transformDates } from '@/util/availability';
+import Sidebar from '@/components/Sidebar';
+import GoogleAuth from '@/components/GoogleAuth';
 
 
 
@@ -70,6 +72,11 @@ export default function HomePage() {
   }
 
   const authorizedMain = <>
+
+  <div style={{ position: 'absolute', top: '24px', right: '150px' }}>
+      <GoogleAuth/>
+    </div>
+    
     <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
       <ViewToggle currentView={view} onChange={(v) => setView(v)} />
     </div>
@@ -77,9 +84,9 @@ export default function HomePage() {
 
     {view === 'monthly' ? (
       <>
-        <h1>Select date and time</h1>
-
+        
         <div className="calendarWrapper">
+          <InfoPanel/>
           <Calendar
             selectedDate={selectedDate}
             availability={availability}
@@ -104,7 +111,14 @@ export default function HomePage() {
 
   return (
     <div className="container">
-      <Sidebar />
+      {
+        view === 'monthly' ? null : (
+        <Sidebar  selectedDate={selectedDate}
+          availability={availability}
+          onDateChange={(date) => setSelectedDate(date)}
+          />)
+      }
+      
       <div className="main">
         {content}
 

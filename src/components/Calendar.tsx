@@ -7,10 +7,25 @@ import React, { useState } from 'react';
 type CalendarProps = {
   selectedDate: Date;              
   availability: TimeSlot[];
-  onDateChange: (date: Date) => void;   
+  onDateChange: (date: Date) => void; 
+  width?: number;
 };
 
-export default function Calendar({ selectedDate, availability, onDateChange }: CalendarProps) {
+export default function Calendar({ selectedDate, availability, onDateChange, width }: CalendarProps) {
+  const monthNames = [
+    'January',
+    'February', 
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [month, setMonth] = useState(selectedDate.getMonth()); // 0=Jan, 1=Feb, ...
 
@@ -47,16 +62,16 @@ export default function Calendar({ selectedDate, availability, onDateChange }: C
   };
 
   return (
-    <div className="calendar">
+    <div className="calendar" style={{width:width}}>
       {/* Calendar Header Section */}
       <div className="calendarHeader">
-        <button onClick={handlePrevMonth} style={{ cursor: 'pointer' }}>
+        <button className="dark-button" onClick={handlePrevMonth} style={{ cursor: 'pointer' }}>
           &larr;  {/* Left Arrow (←) */}
         </button>
         <h3>
-          {year}년 {month + 1}월
+        {monthNames[month]} {year} 
         </h3>
-        <button onClick={handleNextMonth} style={{ cursor: 'pointer' }}>
+        <button className="dark-button" onClick={handleNextMonth} style={{ cursor: 'pointer' }}>
           &rarr;  {/* Right Arrow (→) */}
         </button>
       </div>
