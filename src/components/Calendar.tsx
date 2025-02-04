@@ -1,6 +1,7 @@
 // components/Calendar.tsx
 'use client';
 
+import { useTimezone } from '@/context/TimezoneContext';
 import { hasAvailabilityOnDate, TimeSlot } from '@/util/availability';
 import React, { useState } from 'react';
 
@@ -26,6 +27,8 @@ export default function Calendar({ selectedDate, availability, onDateChange, wid
     'November',
     'December'
   ];
+
+  const { selectedTimezone, setSelectedTimezone } = useTimezone();
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [month, setMonth] = useState(selectedDate.getMonth()); // 0=Jan, 1=Feb, ...
 
@@ -99,7 +102,7 @@ export default function Calendar({ selectedDate, availability, onDateChange, wid
           const isSelected =
             currentDate.toDateString() === selectedDate.toDateString();
           const isAvailable = 
-            hasAvailabilityOnDate(currentDate,availability)
+            hasAvailabilityOnDate(currentDate,availability,selectedTimezone)
           return (
             <div
               key={day}

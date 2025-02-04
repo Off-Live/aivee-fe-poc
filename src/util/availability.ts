@@ -1,4 +1,4 @@
-
+import moment from "moment-timezone";
 
 export interface TimeSlot {
   startDate: Date;
@@ -24,27 +24,56 @@ export const transformDates = (data: AvailabilityResponse): AvailabilityResponse
  };
 
 
- export function checkAvailability(date: Date, time: number, availability: TimeSlot[]): boolean {
-   const hours = Math.floor(time);
-   const minutes = (time % 1) * 60;
-   
-   const targetStart = new Date(date);
-   targetStart.setHours(hours, minutes, 0, 0);
-   
-   const targetEnd = new Date(date);
-   targetEnd.setHours(hours, minutes + 30, 0, 0);
- 
-   return availability.some(slot => 
-     slot.startDate <= targetStart && slot.endDate >= targetEnd
-   );
- }
+ export function checkAvailability(
+  date: Date,
+  time: number,
+  availability: TimeSlot[],
+  timezone: string // 선택한 타임존을 인자로 받습니다.
+): boolean {
+  const hours = Math.floor(time);
+  const minutes = (time % 1) * 60;
 
- export function hasAvailabilityOnDate(date: Date, availability: TimeSlot[]): boolean {
-  const dayStart = new Date(date);
-  dayStart.setHours(0, 0, 0, 0); // 날짜의 시작 시간 (00:00:00)
-  
-  const dayEnd = new Date(dayStart);
-  dayEnd.setDate(dayEnd.getDate() + 1); // 다음 날 자정 (00:00:00)
+  const targetStartMoment = moment.tz(
+    {
+      year: date.getFullYear(),
+      month: date.getMonth(), // 0부터 시작하는 월
+      day: date.getDate(),
+      hour: hours,
+      minute: minutes,
+      second: 0,
+      millisecond: 0,
+    },
+    timezone
+  );
+
+  const targetEndMoment = targetStartMoment.clone().add(30, "minutes");
+
+  const targetStart = targetStartMoment.toDate();
+  const targetEnd = targetEndMoment.toDate();
+
+  return availability.some(
+    (slot) => slot.startDate <= targetStart && slot.endDate >= targetEnd
+  );
+}
+
+export function hasAvailabilityOnDate(date: Date, availability: TimeSlot[], timezone:string): boolean {
+  const dayStartMoment = moment.tz(
+    {
+      year: date.getFullYear(),
+      month: date.getMonth(), // 0부터 시작하는 월
+      day: date.getDate(),
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    },
+    timezone
+  )
+
+  const dayEndMoment = dayStartMoment.clone().add(1,"day");
+
+  const dayStart = dayStartMoment.toDate()
+  const dayEnd = dayEndMoment.toDate()
 
   return availability.some(slot => 
     slot.startDate < dayEnd && slot.endDate > dayStart

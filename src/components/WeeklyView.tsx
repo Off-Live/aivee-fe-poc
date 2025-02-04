@@ -1,6 +1,7 @@
 // components/WeeklyView.tsx
 'use client';
 
+import { useTimezone } from '@/context/TimezoneContext';
 import { TimeSlot,checkAvailability } from '@/util/availability';
 import { CalendarEvent } from '@/util/calendar';
 import React, { useEffect, useState } from 'react';
@@ -35,6 +36,7 @@ const formatTime = (time: number) => {
 };
 
 export default function WeeklyView( {events, currentDate,availability, setCurrentDate, selectSlot}: WeeklyViewProps ) {
+  const { selectedTimezone, setSelectedTimezone } = useTimezone();
   const [weekDays, setWeekDays] = useState<Date[]>([]);
 
   useEffect(() => {
@@ -191,7 +193,7 @@ export default function WeeklyView( {events, currentDate,availability, setCurren
 
               {/* 7 days x 1 hour each */}
               {weekDays.map((day, idx) => {
-                const isAvailable = checkAvailability(day, t, availability)
+                const isAvailable = checkAvailability(day, t, availability,selectedTimezone)
                 const startTime = t;
                 const endTime = t + 0.5;
                 return (

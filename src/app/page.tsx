@@ -14,9 +14,7 @@ import ModalForm from '@/components/ModalForm';
 import { AvailabilityResponse, TimeSlot, transformDates } from '@/util/availability';
 import Sidebar from '@/components/Sidebar';
 import GoogleAuth from '@/components/GoogleAuth';
-
-
-
+import moment from "moment-timezone";
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -26,7 +24,7 @@ export default function HomePage() {
   const [authorized, setAuthorized] = useState(false)
   const [availability, setAvailability] = useState<TimeSlot[]>([])
   const [showModal, setShowModal] = useState(false);
-
+  const [selectedTimezone, setSelectedTimezone] = useState(moment.tz.guess());
 
   const { credential } = useAuth();
   const { monthlyEvents, loading } = useMonthlyEvents(credential?.accessToken, selectedDate)
