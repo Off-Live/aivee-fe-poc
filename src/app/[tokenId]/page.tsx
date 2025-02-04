@@ -9,12 +9,17 @@ import WeeklyView from '@/components/WeeklyView';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useMonthlyEvents } from '@/util/calendar';
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import ModalForm from '@/components/ModalForm';
 import { AvailabilityResponse, TimeSlot, transformDates } from '@/util/availability';
 import Sidebar from '@/components/Sidebar';
 import GoogleAuth from '@/components/GoogleAuth';
 import moment from "moment-timezone";
+
+interface HostInfo{
+  email:string;
+  name:string;
+}
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -24,13 +29,13 @@ export default function HomePage() {
   const [authorized, setAuthorized] = useState(false)
   const [availability, setAvailability] = useState<TimeSlot[]>([])
   const [showModal, setShowModal] = useState(false);
-  const [selectedTimezone, setSelectedTimezone] = useState(moment.tz.guess());
+  const [hostInfo,setHostInfo] = useState<HostInfo>({email:"",name:""})
 
   const { credential } = useAuth();
   const { monthlyEvents, loading } = useMonthlyEvents(credential?.accessToken, selectedDate)
 
-  const param = useSearchParams();
-  const token = param.get('token');
+  const param = useParams();
+  const token = param['tokenId']
 
   useEffect(() => {
     const getAvailabilitySlots = async () => {
@@ -41,24 +46,23 @@ export default function HomePage() {
 
         }
 
-        const json = await response.json() as AvailabilityResponse
+        const json = await response.json()
         const availabilityData = transformDates(json as AvailabilityResponse);
         console.log(availabilityData.availabilities)
 
         setAvailability(availabilityData.availabilities)
         setInitLoading(false)
         setAuthorized(true)
+        setSelectedDate(availabilityData.beginDate)
+        setHostInfo({email:availabilityData.email, name:availabilityData.name})
       } catch (error) {
         setInitLoading(false)
         setAuthorized(false)
       }
 
     }
-    const date = param.get('beginDate') as string;
-    console.log(`date : ${date}`)
-    if (date != null) {
-      setSelectedDate(new Date(date))
-    }
+    
+
     getAvailabilitySlots()
 
   }, [param, token])
@@ -84,7 +88,7 @@ export default function HomePage() {
       <>
         
         <div className="calendarWrapper">
-          <InfoPanel/>
+          <InfoPanel email={hostInfo.email} name={hostInfo.name}/>
           <Calendar
             selectedDate={selectedDate}
             availability={availability}
@@ -113,6 +117,7 @@ export default function HomePage() {
         view === 'monthly' ? null : (
         <Sidebar  selectedDate={selectedDate}
           availability={availability}
+          email={hostInfo.email} name={hostInfo.name}
           onDateChange={(date) => setSelectedDate(date)}
           />)
       }
@@ -122,7 +127,7 @@ export default function HomePage() {
 
       </div>
 
-      <ModalForm show={showModal} selectedSlot={selectedSlot} token={token!} onClose={() => setShowModal(false)} />
+      <ModalForm show={showModal} selectedSlot={selectedSlot} token={String(token!)} onClose={() => setShowModal(false)} />
 
     </div>
   );
