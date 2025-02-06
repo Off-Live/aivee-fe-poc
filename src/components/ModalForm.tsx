@@ -4,13 +4,17 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from '../styles/ModalForm.module.css'; // 위에서 만든 CSS 모듈
 import { TimeSlot } from '@/util/availability';
+import { useAuth } from '@/context/AuthContext';
 
 interface ModalFormProps {
   show: boolean;
   selectedSlot: TimeSlot;
   token: string;
+  hostName:string;
   onClose: () => void;
 }
+
+const signature = "📅 <a href=\"https://sign.aivee.xyz/?utm_source=signature&utm_medium=event&utm_campaign=opening&utm_content=\(activeUser.email)\">Scheduled via Aivee </a>"
 
 const formatTime = (date: Date) => {
 
@@ -37,25 +41,39 @@ function formatLocalDateWithOffset(date: Date) {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${timeZone}`;
 }
 
-const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
-
+const ModalForm = ({ show, selectedSlot, token,hostName, onClose }: ModalFormProps) => {
+  const { user, signInWithGoogle, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     summary: "30 min meeting",
+    name: "",
     email: "",
-    desc: "Created by aivee"
+    desc: ""
   });
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    setFormData({
+      ...formData,
+      email: user?.email ?? "",
+      name:user?.displayName ?? ""
+    })
+  },[user])
+
   const makeReservation = async () => {
     try {
+      let summary = formData.summary
+      if (user) {
+        summary +=` : ${user!.displayName?.split(" ")[0]} x ${hostName.split(" ")[0]}` 
+      }
+    
       const param = {
         token: token,
-        summary: formData.summary,
-        description: formData.desc,
+        summary: summary,
+        description: `${formData.desc}\n${signature}`,
         startDate: formatLocalDateWithOffset(selectedSlot.startDate),
         endDate: formatLocalDateWithOffset(selectedSlot.endDate),
         attendees: [
@@ -63,7 +81,7 @@ const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
         ]
       }
       console.log(param)
-      const response = await fetch(`https://be-dev.aivee.xyz/availability/reserve`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_AIVEE_BACKEND}/availability/reserve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -115,6 +133,18 @@ const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
             />
           </div>
 
+
+          <div style={{ marginBottom: '16px' }}>
+            <label>Name</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+              style={{ display: 'block', width: '100%', marginTop: '4px' }}
+            />
+          </div>
+
           <div style={{ marginBottom: '16px' }}>
             <label>Email</label>
             <input
@@ -133,6 +163,7 @@ const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
               value={formData.desc}
               onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
               style={{ display: 'block', width: '100%', marginTop: '4px' }}
+              placeholder='Description'
             />
           </div>
 

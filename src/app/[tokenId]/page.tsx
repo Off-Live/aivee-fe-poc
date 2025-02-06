@@ -127,7 +127,7 @@ export default function HomePage() {
 
       </div>
 
-      <ModalForm show={showModal} selectedSlot={selectedSlot} token={String(token!)} onClose={() => setShowModal(false)} />
+      <ModalForm show={showModal} selectedSlot={selectedSlot} token={String(token!)} hostName={hostInfo.name} onClose={() => setShowModal(false)} />
 
     </div>
   );

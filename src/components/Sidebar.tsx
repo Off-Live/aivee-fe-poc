@@ -23,8 +23,7 @@ export default function Sidebar({ selectedDate, availability,email,name, onDateC
       
       <TimezoneSelector/>
 
-      <Calendar
-       
+      <Calendar 
        selectedDate={selectedDate}
        availability={availability}
        onDateChange={onDateChange}
