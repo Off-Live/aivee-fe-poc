@@ -1,6 +1,7 @@
 // components/WeeklyView.tsx
 'use client';
 
+import { useAvailability } from '@/context/AvailabilityContext';
 import { useTimezone } from '@/context/TimezoneContext';
 import { TimeSlot,checkAvailability } from '@/util/availability';
 import { CalendarEvent } from '@/util/calendar';
@@ -23,7 +24,6 @@ function getWeekRange(date: Date) {
 type WeeklyViewProps = {
   events:CalendarEvent[];
   currentDate:Date;
-  availability:TimeSlot[];
   setCurrentDate:(date: Date) => void;
   selectSlot:(start:Date, end:Date) => void;
 };
@@ -35,8 +35,9 @@ const formatTime = (time: number) => {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 };
 
-export default function WeeklyView( {events, currentDate,availability, setCurrentDate, selectSlot}: WeeklyViewProps ) {
-  const { selectedTimezone, setSelectedTimezone } = useTimezone();
+export default function WeeklyView( {events, currentDate, setCurrentDate, selectSlot}: WeeklyViewProps ) {
+  const { selectedTimezone } = useTimezone();
+  const { availabilityData} = useAvailability();
   const [weekDays, setWeekDays] = useState<Date[]>([]);
 
   useEffect(() => {
@@ -193,7 +194,7 @@ export default function WeeklyView( {events, currentDate,availability, setCurren
 
               {/* 7 days x 1 hour each */}
               {weekDays.map((day, idx) => {
-                const isAvailable = checkAvailability(day, t, availability,selectedTimezone)
+                const isAvailable = checkAvailability(day, t, availabilityData.availabilities, selectedTimezone)
                 const startTime = t;
                 const endTime = t + 0.5;
                 return (

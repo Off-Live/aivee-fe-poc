@@ -5,12 +5,12 @@ import { createPortal } from 'react-dom';
 import styles from '../styles/ModalForm.module.css'; // 위에서 만든 CSS 모듈
 import { TimeSlot } from '@/util/availability';
 import { useAuth } from '@/context/AuthContext';
+import { useAvailability } from '@/context/AvailabilityContext';
 
 interface ModalFormProps {
   show: boolean;
   selectedSlot: TimeSlot;
   token: string;
-  hostName:string;
   onClose: () => void;
 }
 
@@ -41,8 +41,9 @@ function formatLocalDateWithOffset(date: Date) {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${timeZone}`;
 }
 
-const ModalForm = ({ show, selectedSlot, token,hostName, onClose }: ModalFormProps) => {
-  const { user, signInWithGoogle, logout } = useAuth();
+const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
+  const { user} = useAuth();
+  const {availabilityData} = useAvailability()
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     summary: "30 min meeting",
@@ -50,6 +51,8 @@ const ModalForm = ({ show, selectedSlot, token,hostName, onClose }: ModalFormPro
     email: "",
     desc: ""
   });
+
+  
 
   useEffect(() => {
     setMounted(true);
@@ -67,7 +70,7 @@ const ModalForm = ({ show, selectedSlot, token,hostName, onClose }: ModalFormPro
     try {
       let summary = formData.summary
       if (user) {
-        summary +=` : ${user!.displayName?.split(" ")[0]} x ${hostName.split(" ")[0]}` 
+        summary +=` : ${user!.displayName?.split(" ")[0]} x ${availabilityData.name.split(" ")[0]}` 
       }
     
       const param = {

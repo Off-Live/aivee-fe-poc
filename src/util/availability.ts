@@ -12,6 +12,7 @@ export interface AvailabilityResponse {
   endDate: Date;
   availabilities: TimeSlot[];
   scheduled: TimeSlot[];
+  slotDuration:number;
 }
 
 export const transformDates = (data: AvailabilityResponse): AvailabilityResponse => {

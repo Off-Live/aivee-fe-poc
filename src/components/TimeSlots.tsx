@@ -1,5 +1,6 @@
 // components/TimeSlots.tsx
 
+import { useAvailability } from '@/context/AvailabilityContext';
 import { useTimezone } from '@/context/TimezoneContext';
 import { checkAvailability, TimeSlot } from '@/util/availability';
 import { useEffect, useState } from 'react';
@@ -7,12 +8,12 @@ import { useEffect, useState } from 'react';
 
 type TimeSlotsProps = {
   selectedDate: Date;
-  availability: TimeSlot[];
   selectSlot:(start:Date, end:Date) => void;
 };
 
-export default function TimeSlots({ selectedDate, availability, selectSlot }: TimeSlotsProps) {
-  const { selectedTimezone, setSelectedTimezone } = useTimezone();
+export default function TimeSlots({ selectedDate, selectSlot }: TimeSlotsProps) {
+  const { selectedTimezone} = useTimezone();
+  const { availabilityData} = useAvailability()
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const [is24Hour, setIs24Hour] = useState(true);
 
@@ -51,7 +52,7 @@ export default function TimeSlots({ selectedDate, availability, selectSlot }: Ti
         
       
       {times.map((time, idx) => {
-        if (checkAvailability(selectedDate, time, availability,selectedTimezone)) {
+        if (checkAvailability(selectedDate, time, availabilityData.availabilities ,selectedTimezone)) {
           return (<div
             key={idx}
             className="timeItem"

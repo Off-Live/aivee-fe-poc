@@ -1,18 +1,18 @@
 // components/Calendar.tsx
 'use client';
 
+import { useAvailability } from '@/context/AvailabilityContext';
 import { useTimezone } from '@/context/TimezoneContext';
 import { hasAvailabilityOnDate, TimeSlot } from '@/util/availability';
 import React, { useState } from 'react';
 
 type CalendarProps = {
   selectedDate: Date;              
-  availability: TimeSlot[];
   onDateChange: (date: Date) => void; 
   width?: number;
 };
 
-export default function Calendar({ selectedDate, availability, onDateChange, width }: CalendarProps) {
+export default function Calendar({ selectedDate, onDateChange, width }: CalendarProps) {
   const monthNames = [
     'January',
     'February', 
@@ -28,7 +28,8 @@ export default function Calendar({ selectedDate, availability, onDateChange, wid
     'December'
   ];
 
-  const { selectedTimezone, setSelectedTimezone } = useTimezone();
+  const { selectedTimezone } = useTimezone();
+  const { availabilityData } = useAvailability();
   const [year, setYear] = useState(selectedDate.getFullYear());
   const [month, setMonth] = useState(selectedDate.getMonth()); // 0=Jan, 1=Feb, ...
 
@@ -102,7 +103,7 @@ export default function Calendar({ selectedDate, availability, onDateChange, wid
           const isSelected =
             currentDate.toDateString() === selectedDate.toDateString();
           const isAvailable = 
-            hasAvailabilityOnDate(currentDate,availability,selectedTimezone)
+            hasAvailabilityOnDate(currentDate, availabilityData.availabilities,selectedTimezone)
           return (
             <div
               key={day}

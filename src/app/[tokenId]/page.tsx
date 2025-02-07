@@ -15,6 +15,7 @@ import { AvailabilityResponse, TimeSlot, transformDates } from '@/util/availabil
 import Sidebar from '@/components/Sidebar';
 import GoogleAuth from '@/components/GoogleAuth';
 import moment from "moment-timezone";
+import { useAvailability } from '@/context/AvailabilityContext';
 
 interface HostInfo{
   email:string;
@@ -27,11 +28,10 @@ export default function HomePage() {
   const [view, setView] = useState<'monthly' | 'weekly'>('monthly');
   const [initLoading, setInitLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
-  const [availability, setAvailability] = useState<TimeSlot[]>([])
   const [showModal, setShowModal] = useState(false);
-  const [hostInfo,setHostInfo] = useState<HostInfo>({email:"",name:""})
 
   const { credential } = useAuth();
+  const { availabilityData, setAvailabilityData} = useAvailability()
   const { monthlyEvents, loading } = useMonthlyEvents(credential?.accessToken, selectedDate)
 
   const param = useParams();
@@ -48,13 +48,14 @@ export default function HomePage() {
 
         const json = await response.json()
         const availabilityData = transformDates(json as AvailabilityResponse);
-        console.log(availabilityData.availabilities)
 
-        setAvailability(availabilityData.availabilities)
+        setAvailabilityData(availabilityData)
+        console.log(availabilityData.availabilities)
+        
         setInitLoading(false)
         setAuthorized(true)
         setSelectedDate(availabilityData.beginDate)
-        setHostInfo({email:availabilityData.email, name:availabilityData.name})
+       
       } catch (error) {
         setInitLoading(false)
         setAuthorized(false)
@@ -88,19 +89,18 @@ export default function HomePage() {
       <>
         
         <div className="calendarWrapper">
-          <InfoPanel email={hostInfo.email} name={hostInfo.name}/>
+          <InfoPanel/>
           <Calendar
             selectedDate={selectedDate}
-            availability={availability}
             onDateChange={(date) => setSelectedDate(date)}
           />
-          <TimeSlots selectedDate={selectedDate} availability={availability} selectSlot={selectSlot} />
+          <TimeSlots selectedDate={selectedDate} selectSlot={selectSlot} />
         </div>
       </>
     ) : (
       <>
         <h1>Weekly View</h1>
-        <WeeklyView events={monthlyEvents} currentDate={selectedDate} availability={availability} setCurrentDate={setSelectedDate} selectSlot={selectSlot} />
+        <WeeklyView events={monthlyEvents} currentDate={selectedDate} setCurrentDate={setSelectedDate} selectSlot={selectSlot} />
       </>
     )}
   </>
@@ -116,18 +116,15 @@ export default function HomePage() {
       {
         view === 'monthly' ? null : (
         <Sidebar  selectedDate={selectedDate}
-          availability={availability}
-          email={hostInfo.email} name={hostInfo.name}
           onDateChange={(date) => setSelectedDate(date)}
           />)
       }
-      
       <div className="main">
         {content}
 
       </div>
 
-      <ModalForm show={showModal} selectedSlot={selectedSlot} token={String(token!)} hostName={hostInfo.name} onClose={() => setShowModal(false)} />
+      <ModalForm show={showModal} selectedSlot={selectedSlot} token={String(token!)}  onClose={() => setShowModal(false)} />
 
     </div>
   );

@@ -4,6 +4,7 @@ import '../styles/globals.css';
 
 import { ReactNode, Suspense } from 'react';
 import { TimezoneProvider } from '@/context/TimezoneContext';
+import { AvailabilityProvider } from '@/context/AvailabilityContext';
 
 export const metadata = {
   title: 'Calendar Scheduling Example',
@@ -11,17 +12,19 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <TimezoneProvider>
-      <AuthProvider>
-        <html lang="ko">
-          <Suspense>
-            <body>
-              {children}
-            </body>
-          </Suspense>
-        </html>
-      </AuthProvider>
-    </TimezoneProvider>
+    <AvailabilityProvider>
+      <TimezoneProvider>
+        <AuthProvider>
+          <html lang="ko">
+            <Suspense>
+              <body>
+                {children}
+              </body>
+            </Suspense>
+          </html>
+        </AuthProvider>
+      </TimezoneProvider>
+    </AvailabilityProvider>
 
   );
 }
