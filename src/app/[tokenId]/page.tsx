@@ -66,7 +66,7 @@ export default function HomePage() {
 
     getAvailabilitySlots()
 
-  }, [param, token])
+  }, [param, token, setAvailabilityData])
 
   const selectSlot = (start: Date, end: Date) => {
     setSelectedSlot({ startDate: start, endDate: end })

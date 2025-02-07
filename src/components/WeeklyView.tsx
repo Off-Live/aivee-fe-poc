@@ -52,7 +52,7 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
   }, [currentDate]);
 
   useEffect(() => {
-    let slots:TimeSlot[] = []
+    const slots:TimeSlot[] = []
     availabilityData.availabilities.forEach((slot)=>{
       const startMoment = moment.tz(slot.startDate, selectedTimezone)
       const endMoment = moment.tz(slot.endDate, selectedTimezone)
