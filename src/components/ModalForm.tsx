@@ -6,6 +6,8 @@ import styles from '../styles/ModalForm.module.css'; // 위에서 만든 CSS 모
 import { TimeSlot } from '@/util/availability';
 import { useAuth } from '@/context/AuthContext';
 import { useAvailability } from '@/context/AvailabilityContext';
+import { useTimezone } from '@/context/TimezoneContext';
+import moment from 'moment';
 
 interface ModalFormProps {
   show: boolean;
@@ -16,10 +18,10 @@ interface ModalFormProps {
 
 const signature = "📅 <a href=\"https://sign.aivee.xyz/?utm_source=signature&utm_medium=event&utm_campaign=opening&utm_content=\(activeUser.email)\">Scheduled via Aivee </a>"
 
-const formatTime = (date: Date) => {
-
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
+const formatTime = (date: Date, timezone:string) => {
+  const dateMoment = moment.tz(date, timezone)
+  const hours = dateMoment.hour()
+  const minutes = dateMoment.minute()
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 };
 
@@ -42,11 +44,12 @@ function formatLocalDateWithOffset(date: Date) {
 }
 
 const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
+  const {selectedTimezone} = useTimezone()
   const { user} = useAuth();
   const {availabilityData} = useAvailability()
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
-    summary: "30 min meeting",
+    summary: `${availabilityData.slotDuration}min meeting`,
     name: "",
     email: "",
     desc: ""
@@ -116,7 +119,7 @@ const ModalForm = ({ show, selectedSlot, token, onClose }: ModalFormProps) => {
         <button className={styles.closeButton} onClick={onClose}>
           &times;
         </button>
-        <h2>{selectedSlot.startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} {formatTime(selectedSlot.startDate)}-{formatTime(selectedSlot.endDate)} </h2>
+        <h2>{moment.tz(selectedSlot.startDate,selectedTimezone).format(`MMM D, YYYY`)} {formatTime(selectedSlot.startDate, selectedTimezone)}-{formatTime(selectedSlot.endDate, selectedTimezone)} </h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
