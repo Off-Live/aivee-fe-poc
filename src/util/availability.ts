@@ -99,14 +99,14 @@ export function getAvailableTimeSlotsForDate(
   // First split all availability slots
   const allSplitSlots = splitAvailabilitySlots(availabilitySlots, slotDuration);
   
-  // Create moment objects for start and end of the target date
-  const dayStart = moment.tz(date, timezone).startOf('day');
-  const dayEnd = dayStart.clone().endOf('day');
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
 
   // Filter slots that fall within the target date
   return allSplitSlots.filter(slot => {
     const slotStart = moment.tz(slot.startDate, timezone);
-    return slotStart.isSameOrAfter(dayStart) && slotStart.isBefore(dayEnd);
+    return (year === slotStart.year()) && (month === slotStart.month()) && (day=== slotStart.date())
   });
 }
 

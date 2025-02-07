@@ -43,11 +43,47 @@ const formatTime = (time: number) => {
 export default function WeeklyView({ events, currentDate, setCurrentDate, selectSlot }: WeeklyViewProps) {
   const { selectedTimezone } = useTimezone();
   const { availabilityData } = useAvailability();
+
+  const [slotsWithinDay, setSlotsWithinDay] = useState<TimeSlot[]>([])
   const [weekDays, setWeekDays] = useState<Date[]>([]);
 
   useEffect(() => {
     setWeekDays(getWeekRange(currentDate));
   }, [currentDate]);
+
+  useEffect(() => {
+    let slots:TimeSlot[] = []
+    availabilityData.availabilities.forEach((slot)=>{
+      const startMoment = moment.tz(slot.startDate, selectedTimezone)
+      const endMoment = moment.tz(slot.endDate, selectedTimezone)
+      
+      const isWithinDay = (startMoment.year() === endMoment.year()) &&
+        (startMoment.month() === endMoment.month()) &&
+        (startMoment.date() === endMoment.date()) 
+        
+      if (isWithinDay){
+        slots.push(slot)
+      }else{
+        const splitMoment = moment.tz(
+          {
+            year: endMoment.year(),
+            month: endMoment.month(), 
+            day: endMoment.date(),
+            hour: 0,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
+          },selectedTimezone)
+
+        slots.push({startDate:startMoment.toDate(), endDate:splitMoment.toDate()});
+        slots.push({startDate:splitMoment.toDate(), endDate:endMoment.toDate()});
+        
+      }
+      
+    })
+    setSlotsWithinDay(slots)
+    
+  }, [selectedTimezone, availabilityData, weekDays])
 
   const handlePrevWeek = () => {
     const newDate = new Date(currentDate);
@@ -69,21 +105,6 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
     return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
   };
 
-  // const handleCellClick = (day: Date, time: number) => {
-  //   const hours = Math.floor(time);
-  //   const minutes = (time % 1) * 60;
-
-  //   const start = new Date(day);
-  //   start.setHours(hours, minutes, 0, 0);
-
-  //   const end = new Date(start);
-  //   end.setMinutes(minutes + 30);
-
-  //   selectSlot(start, end)
-  // };
-
-
-
   // Date range string (e.g., 1/14 - 1/20, 2025)
   const start = weekDays[0];
   const end = weekDays[6];
@@ -95,8 +116,6 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
 
   const times = Array.from({ length: 50 }, (_, i) => i * 0.5 - 0.5);
 
-  // (Optional) Calculate current time position in pixels within the grid
-  // This is just for demo (real-time calculation needed)
   const [currentLinePos, setCurrentLinePos] = useState<number | null>(null);
 
   useEffect(() => {
@@ -133,14 +152,18 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
 
   const getTimeSlotPositionStyle = (startDate: Date, endDate: Date, offset: number) => {
 
+    const startDateMoment = moment.tz(startDate, selectedTimezone)
+    const endDateMoment = moment.tz(endDate, selectedTimezone)
+
     // 1) Check if event is within this week's range
     //    If startDate or endDate is outside the week range, ignore for now (simplified).
     //    For more accurate handling, we could add logic to calculate overlapping portions.
+
     const dayIndex = weekDays.findIndex(
       (d) =>
-        d.getFullYear() === startDate.getFullYear() &&
-        d.getMonth() === startDate.getMonth() &&
-        d.getDate() === startDate.getDate()
+        d.getFullYear() === startDateMoment.year() &&
+        d.getMonth() === startDateMoment.month() &&
+        d.getDate() === startDateMoment.date()
     );
     // Don't display events not in this week
     if (dayIndex === -1) return { display: 'none' };
@@ -150,8 +173,12 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
 
     // 3) Event start~end (calculate in minutes → convert to px)
     //    Calculate minutes from start of day and use as top/height
-    const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
-    const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
+    const startMinutes = startDateMoment.hour() * 60 + startDateMoment.minute();
+    let endMinutes = endDateMoment.hour() * 60 + endDateMoment.minute();
+
+    //handle 00:00
+    if (endMinutes==0) {endMinutes = 1440}
+
     const top = startMinutes + 30;
     const height = Math.max(endMinutes - startMinutes, 15) - 5;
     // Show at least 15px (for very short events)
@@ -164,8 +191,6 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
       height: `${height}px`,
     };
   }
-
-
 
   return (
     <div>
@@ -210,7 +235,6 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
 
               {/* 7 days x 1 hour each */}
               {weekDays.map((day, idx) => {
-                //const isAvailable = checkAvailability(day, t, availabilityData.availabilities, selectedTimezone)
                 const startTime = t;
                 const endTime = t + 0.5;
                 return (
@@ -218,16 +242,15 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
                     key={`cell-${t}-${idx}`}
                     className={`weekly-cell ${t % 1 === 0 ? '' : 'hour-line'} blocked`}
                     data-time={`${formatTime(startTime)} - ${formatTime(endTime)}`}
-                  //onClick={isAvailable ? () => handleCellClick(day, t) : undefined} 
                   >
-                    {/* Add content (events, reservations) here if needed */}
+                  
                   </div>
                 );
               })}
             </React.Fragment>
           ))}
 
-          {availabilityData.availabilities.map((slot, idx) => {
+          {slotsWithinDay.map((slot, idx) => {
             const style = getTimeSlotPositionStyle(slot.startDate, slot.endDate, 0);
             return <div
               key={`availability-${idx}`}
@@ -237,7 +260,7 @@ export default function WeeklyView({ events, currentDate, setCurrentDate, select
           })}
 
           {weekDays.map((day, idx) => {
-            const slots = getAvailableTimeSlotsForDate(day,availabilityData.availabilities,availabilityData.slotDuration,selectedTimezone)
+            const slots = getAvailableTimeSlotsForDate(day,slotsWithinDay,availabilityData.slotDuration,selectedTimezone)
             
             return <>
               {slots.map((slot,idx2)=>{
