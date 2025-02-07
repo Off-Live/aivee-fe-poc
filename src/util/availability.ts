@@ -63,6 +63,52 @@ export const transformDates = (data: AvailabilityResponse): AvailabilityResponse
     (slot) => slot.startDate <= targetStart && slot.endDate >= targetEnd
   );
 }
+export function splitAvailabilitySlots(
+  availabilitySlots: TimeSlot[],
+  slotDuration: number
+): TimeSlot[] {
+  const splitSlots: TimeSlot[] = [];
+
+  availabilitySlots.forEach(slot => {
+    let currentStart = moment(slot.startDate);
+    const slotEnd = moment(slot.endDate);
+
+    // Continue splitting while we can fit another slot
+    while (currentStart.clone().add(slotDuration, 'minutes').isSameOrBefore(slotEnd)) {
+      const splitSlotEnd = currentStart.clone().add(slotDuration, 'minutes');
+      
+      splitSlots.push({
+        startDate: currentStart.toDate(),
+        endDate: splitSlotEnd.toDate()
+      });
+
+      // Move to the next slot start
+      currentStart = splitSlotEnd;
+    }
+  });
+
+  return splitSlots;
+}
+
+export function getAvailableTimeSlotsForDate(
+  date: Date,
+  availabilitySlots: TimeSlot[],
+  slotDuration: number,
+  timezone: string
+): TimeSlot[] {
+  // First split all availability slots
+  const allSplitSlots = splitAvailabilitySlots(availabilitySlots, slotDuration);
+  
+  // Create moment objects for start and end of the target date
+  const dayStart = moment.tz(date, timezone).startOf('day');
+  const dayEnd = dayStart.clone().endOf('day');
+
+  // Filter slots that fall within the target date
+  return allSplitSlots.filter(slot => {
+    const slotStart = moment.tz(slot.startDate, timezone);
+    return slotStart.isSameOrAfter(dayStart) && slotStart.isBefore(dayEnd);
+  });
+}
 
 export function hasAvailabilityOnDate(date: Date, availability: TimeSlot[], timezone:string): boolean {
   const dayStartMoment = moment.tz(

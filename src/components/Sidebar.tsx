@@ -18,7 +18,7 @@ export default function Sidebar({ selectedDate, onDateChange }: SidebarProps) {
     <div className = "sidebar">
       
       <h2 style={{ margin: '8px 0' }}>{availabilityData.name}</h2>
-      <h3 style={{ margin: '8px 0' }}>Available slots</h3>
+      <h3 style={{ margin: '8px 0' }}>{availabilityData.slotDuration}min slots</h3>
       
       <TimezoneSelector/>
 

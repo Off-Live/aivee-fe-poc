@@ -11,7 +11,7 @@ export default function InfoPanel() {
     <div className = "info-panel">
       
       <h2 style={{ margin: '8px 0' }}>{availabilityData.name}</h2>
-      <h3 style={{ margin: '8px 0' }}>Available slots</h3>
+      <h3 style={{ margin: '8px 0' }}>{availabilityData.slotDuration}min slots</h3>
       <TimezoneSelector/>
       
     </div>
