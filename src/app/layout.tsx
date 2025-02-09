@@ -1,30 +1,36 @@
 // app/layout.tsx
-import { AuthProvider } from '@/context/AuthContext';
-import '../styles/globals.css';
+import { ReactNode, Suspense } from "react";
+import { Nunito } from "next/font/google";
+import { TimezoneProvider } from "@/context/TimezoneContext";
+import { AvailabilityProvider } from "@/context/AvailabilityContext";
+import { AuthProvider } from "@/context/AuthContext";
+import "../styles/globals.css";
 
-import { ReactNode, Suspense } from 'react';
-import { TimezoneProvider } from '@/context/TimezoneContext';
-import { AvailabilityProvider } from '@/context/AvailabilityContext';
+const nunito = Nunito({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-nunito",
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+});
 
 export const metadata = {
-  title: 'Calendar Scheduling Example',
+  title: "Aivee Reservation",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <AvailabilityProvider>
-      <TimezoneProvider>
-        <AuthProvider>
-          <html lang="ko">
-            <Suspense>
-              <body>
-                {children}
-              </body>
-            </Suspense>
-          </html>
-        </AuthProvider>
-      </TimezoneProvider>
-    </AvailabilityProvider>
-
+    <html lang="en" className={`dark ${nunito.variable}`}>
+      <body
+        className={`${nunito.className} bg-default text-white min-h-screen`}
+      >
+        <AvailabilityProvider>
+          <TimezoneProvider>
+            <AuthProvider>
+              <Suspense>{children}</Suspense>
+            </AuthProvider>
+          </TimezoneProvider>
+        </AvailabilityProvider>
+      </body>
+    </html>
   );
 }

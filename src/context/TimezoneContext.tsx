@@ -1,8 +1,8 @@
-'use client'
+"use client";
 // TimezoneContext.tsx
 
-import React, { createContext, useContext, useState } from 'react';
-import moment from 'moment-timezone';
+import React, { createContext, useContext, useState } from "react";
+import moment from "moment-timezone";
 
 // Context에 저장할 값의 타입
 interface TimezoneContextProps {
@@ -12,7 +12,7 @@ interface TimezoneContextProps {
 
 // Context 객체 생성 (초깃값은 undefined로 설정)
 const TimezoneContext = createContext<TimezoneContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 // Provider 컴포넌트
@@ -21,7 +21,7 @@ export const TimezoneProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   // 사용자의 현재 시스템에서 추정한 타임존을 기본값으로 사용
   const [selectedTimezone, setSelectedTimezone] = useState(
-    moment.tz.guess() // 예: 'Asia/Seoul'
+    moment.tz.guess(), // 예: 'Asia/Seoul'
   );
 
   // Context에서 관리할 값
@@ -41,7 +41,7 @@ export const TimezoneProvider: React.FC<{ children: React.ReactNode }> = ({
 export function useTimezone() {
   const context = useContext(TimezoneContext);
   if (!context) {
-    throw new Error('useTimezone must be used within a TimezoneProvider');
+    throw new Error("useTimezone must be used within a TimezoneProvider");
   }
   return context;
 }

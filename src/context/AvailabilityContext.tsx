@@ -1,35 +1,29 @@
-'use client'
-import { AvailabilityResponse } from '@/util/availability';
-import React, { createContext, useContext, useState } from 'react';
+"use client";
+import { AvailabilityData } from "@/util/availability";
+import React, { createContext, useContext, useState } from "react";
 
 // Context에 저장할 값의 타입
 interface AvailabilityContextProps {
-  availabilityData : AvailabilityResponse;
-  setAvailabilityData: (data:AvailabilityResponse) => void;
+  availabilityData: AvailabilityData;
+  setAvailabilityData: (data: AvailabilityData) => void;
 }
 
-
 const AvailabilityContext = createContext<AvailabilityContextProps | undefined>(
-  undefined
+  undefined,
 );
-
 
 export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  
-  const [availabilityData, setAvailabilityData] = useState<AvailabilityResponse>(
-    {
-      email: "",
-      name: "",
-      beginDate: new Date(),
-      endDate: new Date(),
-      availabilities: [],
-      scheduled: [],
-      slotDuration:0
-    }
-    
-  );
+  const [availabilityData, setAvailabilityData] = useState<AvailabilityData>({
+    email: "",
+    name: "",
+    beginDate: new Date(),
+    endDate: new Date(),
+    availabilities: [],
+    scheduled: [],
+    slotDuration: 0,
+  });
 
   // Context에서 관리할 값
   const contextValue: AvailabilityContextProps = {
@@ -48,7 +42,9 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({
 export function useAvailability() {
   const context = useContext(AvailabilityContext);
   if (!context) {
-    throw new Error('useAvailability  must be used within a AvailabilityProvider');
+    throw new Error(
+      "useAvailability  must be used within a AvailabilityProvider",
+    );
   }
   return context;
 }

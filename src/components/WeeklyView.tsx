@@ -1,307 +1,231 @@
-// components/WeeklyView.tsx
-'use client';
+"use client";
 
-import { useAvailability } from '@/context/AvailabilityContext';
-import { useTimezone } from '@/context/TimezoneContext';
-import { TimeSlot, checkAvailability, getAvailableTimeSlotsForDate } from '@/util/availability';
-import { CalendarEvent } from '@/util/calendar';
-import React, { useEffect, useState } from 'react';
-import moment from 'moment-timezone';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useAvailability } from "@/context/AvailabilityContext";
+import { useTimezone } from "@/context/TimezoneContext";
+import { TimeSlot, getAvailableTimeSlotsForDate } from "@/util/availability";
+import { CalendarEvent } from "@/util/calendar";
+import { getWeekRange } from "@/util/date";
+import { DateHeader } from "./weekly/DateHeader";
+import { TimeAxis } from "./weekly/TimeAxis";
+import { TimeGrid } from "./weekly/TimeGrid";
+import { TimeSlotComponent } from "./weekly/TimeSlotComponent";
+import { CalendarEventComponent } from "./weekly/CalendarEvent";
+import moment from "moment-timezone";
 
-
-function getWeekRange(date: Date) {
-  const day = date.getDay();
-  const sunday = new Date(date);
-  sunday.setDate(sunday.getDate() - day);
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(sunday);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
-  return weekDays;
-}
-
-
-type WeeklyViewProps = {
+interface WeeklyViewV3Props {
   events: CalendarEvent[];
   currentDate: Date;
-  setCurrentDate: (date: Date) => void;
   selectSlot: (start: Date, end: Date) => void;
-};
+  showGuestCalendar: boolean;
+}
 
-const formatTime = (time: number) => {
-  const adjustedTime = ((time % 24) + 24) % 24; // Handle negative/over 24h
-  const hours = Math.floor(adjustedTime);
-  const minutes = (adjustedTime % 1) * 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-};
-
-
-  
-
-
-export default function WeeklyView({ events, currentDate, setCurrentDate, selectSlot }: WeeklyViewProps) {
+export default function WeeklyView({
+  events,
+  currentDate,
+  selectSlot,
+  showGuestCalendar,
+}: WeeklyViewV3Props) {
   const { selectedTimezone } = useTimezone();
   const { availabilityData } = useAvailability();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  const [slotsWithinDay, setSlotsWithinDay] = useState<TimeSlot[]>([])
   const [weekDays, setWeekDays] = useState<Date[]>([]);
+  const [cellWidth, setCellWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(720);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
+
+  const timeAxisWidth = 60;
+  const cellHeight = 60;
+  const headerHeight = 40;
 
   useEffect(() => {
     setWeekDays(getWeekRange(currentDate));
   }, [currentDate]);
 
   useEffect(() => {
-    const slots:TimeSlot[] = []
-    availabilityData.availabilities.forEach((slot)=>{
-      const startMoment = moment.tz(slot.startDate, selectedTimezone)
-      const endMoment = moment.tz(slot.endDate, selectedTimezone)
-      
-      const isWithinDay = (startMoment.year() === endMoment.year()) &&
-        (startMoment.month() === endMoment.month()) &&
-        (startMoment.date() === endMoment.date()) 
-        
-      if (isWithinDay){
-        slots.push(slot)
-      }else{
-        const splitMoment = moment.tz(
-          {
-            year: endMoment.year(),
-            month: endMoment.month(), 
-            day: endMoment.date(),
-            hour: 0,
-            minute: 0,
-            second: 0,
-            millisecond: 0,
-          },selectedTimezone)
-
-        slots.push({startDate:startMoment.toDate(), endDate:splitMoment.toDate()});
-        slots.push({startDate:splitMoment.toDate(), endDate:endMoment.toDate()});
-        
+    const updateSize = () => {
+      const container = containerRef.current;
+      if (container) {
+        setContainerHeight(container.offsetHeight - headerHeight);
+        const containerWidth = container.offsetWidth;
+        const newCellWidth = Math.floor((containerWidth - timeAxisWidth) / 7);
+        setCellWidth(newCellWidth);
       }
-      
-    })
-    setSlotsWithinDay(slots)
-    
-  }, [selectedTimezone, availabilityData, weekDays])
+    };
 
-  const handlePrevWeek = () => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() - 7);
-    setCurrentDate(newDate);
-  };
-
-  const handleNextWeek = () => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() + 7);
-    setCurrentDate(newDate);
-  };
-
-  const formatSlotTime = (date: Date): string => {
-    // Convert the date to the selected timezone
-    const timeInZone = moment(date).tz(selectedTimezone);
-    const hour = timeInZone.hour()
-    const minute = timeInZone.minute()
-    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-  };
-
-  // Date range string (e.g., 1/14 - 1/20, 2025)
-  const start = weekDays[0];
-  const end = weekDays[6];
-  const rangeString =
-    start && end
-      ? `${start.getMonth() + 1}/${start.getDate()} - ${end.getMonth() + 1}/${end.getDate()}, ${start.getFullYear()}`
-      : '';
-
-
-  const times = Array.from({ length: 50 }, (_, i) => i * 0.5 - 0.5);
-
-  const [currentLinePos, setCurrentLinePos] = useState<number | null>(null);
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
   useEffect(() => {
-    
-    const updatePosition = () => {
-      const now = new Date();
-      if (
-        now.getFullYear() === currentDate.getFullYear() &&
-        now.getMonth() === currentDate.getMonth()
-      ) {
-        const hour = now.getHours();
-        const minute = now.getMinutes();
-        const pos = hour * 60 + minute + 30;
-        setCurrentLinePos(pos);
-      } else {
-        setCurrentLinePos(null);
-      }
-    };
-    updatePosition();
-    const timer = setInterval(updatePosition, 60 * 1000);
-    return () => clearInterval(timer);
-  }, [currentDate]);
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
 
+    const now = moment().tz(selectedTimezone);
+    const currentMinutes = now.hours() * 60 + now.minutes();
+    const scrollPosition = (currentMinutes / 60) * cellHeight;
 
-  // ------------------------------------------
-  // Helper function to display events in weekly view
-  // ------------------------------------------
-  const getEventPositionStyle = (event: CalendarEvent) => {
-    const startDate = new Date(event.start.dateTime);
-    const endDate = new Date(event.end.dateTime);
+    const containerHeight = scrollContainer.clientHeight;
+    const centerOffset = containerHeight / 2;
 
-    return getTimeSlotPositionStyle(startDate, endDate, 5)
-  };
+    scrollContainer.scrollTop = scrollPosition - centerOffset;
+  }, [selectedTimezone, cellHeight]);
 
-  const getTimeSlotPositionStyle = (startDate: Date, endDate: Date, offset: number) => {
+  useEffect(() => {
+    if (!weekDays.length) return;
 
-    const startDateMoment = moment.tz(startDate, selectedTimezone)
-    const endDateMoment = moment.tz(endDate, selectedTimezone)
+    const allSlots: TimeSlot[] = [];
+    weekDays.forEach((day) => {
+      const slotsForDay = getAvailableTimeSlotsForDate(
+        day,
+        availabilityData.availabilities,
+        availabilityData.slotDuration,
+        selectedTimezone,
+      );
+      allSlots.push(...slotsForDay);
+    });
+    setAvailableSlots(allSlots);
+  }, [weekDays, availabilityData, selectedTimezone]);
 
-    // 1) Check if event is within this week's range
-    //    If startDate or endDate is outside the week range, ignore for now (simplified).
-    //    For more accurate handling, we could add logic to calculate overlapping portions.
+  const getSlotPositionStyle = (startDate: Date, endDate: Date) => {
+    const startMoment = moment.tz(startDate, selectedTimezone);
+    const endMoment = moment.tz(endDate, selectedTimezone);
 
     const dayIndex = weekDays.findIndex(
-      (d) =>
-        d.getFullYear() === startDateMoment.year() &&
-        d.getMonth() === startDateMoment.month() &&
-        d.getDate() === startDateMoment.date()
+      (day) =>
+        day.getDate() === startMoment.date() &&
+        day.getMonth() === startMoment.month() &&
+        day.getFullYear() === startMoment.year(),
     );
-    // Don't display events not in this week
-    if (dayIndex === -1) return { display: 'none' };
 
-    // 2) Horizontal position for the day = left offset(80px) + dayIndex * cell width(150px)
-    const left = 60 + dayIndex * 150;
+    if (dayIndex === -1) return null;
 
-    // 3) Event start~end (calculate in minutes → convert to px)
-    //    Calculate minutes from start of day and use as top/height
-    const startMinutes = startDateMoment.hour() * 60 + startDateMoment.minute();
-    let endMinutes = endDateMoment.hour() * 60 + endDateMoment.minute();
-
-    //handle 00:00
-    if (endMinutes==0) {endMinutes = 1440}
-
-    const top = startMinutes + 30;
-    const height = Math.max(endMinutes - startMinutes, 15) - 5;
-    // Show at least 15px (for very short events)
+    const startMinutes = startMoment.hours() * 60 + startMoment.minutes();
+    const endMinutes = endMoment.hours() * 60 + endMoment.minutes();
 
     return {
-      position: 'absolute' as const,
-      top: `${top}px`,
-      left: `${left}px`,
-      width: `${150 - offset}px`,
-      height: `${height}px`,
+      left: `${dayIndex * cellWidth}px`,
+      top: `${(startMinutes / 60 + 0.5) * cellHeight}px`,
+      height: `${((endMinutes - startMinutes) / 60) * cellHeight}px`,
+      width: `${cellWidth - 1}px`,
     };
-  }
+  };
+
+  const getEventPositionStyle = (startDate: Date, endDate: Date) => {
+    const startMoment = moment.tz(startDate, selectedTimezone);
+    const endMoment = moment.tz(endDate, selectedTimezone);
+
+    const dayIndex = weekDays.findIndex(
+      (day) =>
+        day.getDate() === startMoment.date() &&
+        day.getMonth() === startMoment.month() &&
+        day.getFullYear() === startMoment.year(),
+    );
+
+    if (dayIndex === -1) return null;
+
+    const startMinutes = startMoment.hours() * 60 + startMoment.minutes();
+    const endMinutes = endMoment.hours() * 60 + endMoment.minutes();
+
+    return {
+      left: `${dayIndex * cellWidth + 3}px`,
+      top: `${(startMinutes / 60 + 0.5) * cellHeight}px`,
+      height: `${((endMinutes - startMinutes) / 60) * cellHeight}px`,
+      width: `${cellWidth - 14}px`,
+    };
+  };
+
+  const currentTimePos = useMemo(
+    () =>
+      ((moment().tz(selectedTimezone).hours() * 60 +
+        moment().tz(selectedTimezone).minutes() +
+        30) /
+        60) *
+      cellHeight,
+    [selectedTimezone],
+  );
+
+  const currentTime = useMemo(() => {
+    return moment().tz(selectedTimezone).format("h:mma");
+  }, [selectedTimezone]);
 
   return (
-    <div>
-      {/* Weekly View Header */}
-      <div className="weekly-header">
-        <div className="weekly-nav">
-          <button onClick={handlePrevWeek}>{`<`}</button>
-        </div>
-        <h2>{rangeString}</h2>
-        <div className="weekly-nav">
-          <button onClick={handleNextWeek}>{`>`}</button>
-        </div>
+    <div
+      ref={containerRef}
+      className="w-full h-full flex flex-col bg-default border border-border overflow-hidden"
+    >
+      <div
+        className="flex flex-row py-2 justify-evenly border-b-2"
+        style={{ paddingLeft: timeAxisWidth }}
+      >
+        {weekDays.map((date) => (
+          <div key={date.toISOString()} style={{ width: cellWidth }}>
+            <DateHeader date={date} />
+          </div>
+        ))}
       </div>
 
-      {/* Weekly Grid */}
-      <div className="weekly-grid-container" style={{ position: 'relative' }}>
-        {/* Day Header */}
-        <div className="weekly-grid-header">
-          <div></div> {/* Empty top-left cell (time axis space) */}
-          {weekDays.map((d) => {
-            const dayLabel = `${d.getMonth() + 1}/${d.getDate()}`;
-            const dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()];
+      {/* Scrollable time grid */}
+      <div
+        ref={scrollContainerRef}
+        className="flex flex-row overflow-y-auto"
+        style={{ height: `${containerHeight}px` }}
+      >
+        <TimeAxis width={timeAxisWidth} cellHeight={cellHeight}>
+          <div
+            className="absolute right-0 flex items-center pr-2"
+            style={{
+              top: `${currentTimePos}px`,
+              transform: "translateY(-50%)",
+            }}
+          >
+            <span className="text-xs text-main font-bold">{currentTime}</span>
+          </div>
+        </TimeAxis>
+        <TimeGrid cellWidth={cellWidth} cellHeight={cellHeight}>
+          <div
+            className="absolute w-full h-[1.5px] bg-main z-10"
+            style={{
+              top: `${currentTimePos}px`,
+            }}
+          />
+
+          {/* Available time slots */}
+          {availableSlots.map((slot, index) => {
+            const style = getSlotPositionStyle(slot.startDate, slot.endDate);
+            if (!style) return null;
+
             return (
-              <div key={dayLabel}>
-                {dayLabel} ({dow})
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Actual time * 7 days grid */}
-        <div className="weekly-grid-body">
-          {/* Vertical axis: time */}
-          {times.map((t) => (
-            <React.Fragment key={`row-${t}`}>
-              {/* Time cell */}
-              <div className="weekly-time-cell">
-                <span className="time-label">
-                  {t % 1 === 0 && `${Math.floor(t).toString().padStart(2, '0')}:00`}
-                </span>
-              </div>
-
-              {/* 7 days x 1 hour each */}
-              {weekDays.map((day, idx) => {
-                const startTime = t;
-                const endTime = t + 0.5;
-                return (
-                  <div
-                    key={`cell-${t}-${idx}`}
-                    className={`weekly-cell ${t % 1 === 0 ? '' : 'hour-line'} blocked`}
-                    data-time={`${formatTime(startTime)} - ${formatTime(endTime)}`}
-                  >
-                  
-                  </div>
-                );
-              })}
-            </React.Fragment>
-          ))}
-
-          {slotsWithinDay.map((slot, idx) => {
-            const style = getTimeSlotPositionStyle(slot.startDate, slot.endDate, 0);
-            return <div
-              key={`availability-${idx}`}
-              className="available-slot"
-              style={style}
-            />
-          })}
-
-          {weekDays.map((day, idx) => {
-            const slots = getAvailableTimeSlotsForDate(day,slotsWithinDay,availabilityData.slotDuration,selectedTimezone)
-            
-            return <>
-              {slots.map((slot,idx2)=>{
-                const style = getTimeSlotPositionStyle(slot.startDate, slot.endDate, 0);
-              return <div
-                key={`splitted-${idx}-${idx2}`}
-                data-time={`${formatSlotTime(slot.startDate)} - ${formatSlotTime(slot.endDate)}`}
-                className="splitted-slot"
+              <TimeSlotComponent
+                key={`slot-${index}`}
+                slot={slot}
                 style={style}
-                onClick={()=>selectSlot(slot.startDate, slot.endDate)} 
+                onClick={() => selectSlot(slot.startDate, slot.endDate)}
               />
-              })}
-            </>
-            
-          })}
-
-
-          {events.map((event) => {
-            const style = getEventPositionStyle(event);
-            return (
-              <div
-                key={event.id}
-                className="calendar-event"
-                style={style}
-                title={event.summary}
-              >
-                <div className="event-content">{event.summary}</div>
-              </div>
             );
           })}
 
-          {/* Current time line (demo) */}
-          {currentLinePos !== null && (
-            <div
-              className="current-time-line"
-              style={{ top: currentLinePos + 'px' }}
-            />
-          )}
-        </div>
+          {/* CalendarView events */}
+          {showGuestCalendar &&
+            events.map((event) => {
+              const style = getEventPositionStyle(
+                new Date(event.start.dateTime),
+                new Date(event.end.dateTime),
+              );
+              if (!style) return null;
 
-
+              return (
+                <CalendarEventComponent
+                  key={event.id}
+                  event={event}
+                  style={style}
+                />
+              );
+            })}
+        </TimeGrid>
       </div>
     </div>
   );
