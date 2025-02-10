@@ -10,3 +10,10 @@ export const FIREBASE_CONFIG = {
 
 export const AIVEE_BACKEND_URL = process.env.NEXT_PUBLIC_AIVEE_BACKEND || "";
 export const AIVEE_HOME_URL = "https://aivee.xyz";
+
+export const siteConfig = {
+  title: "Aivee Booking",
+  description: "Aivee, The smartest and fastest way to schedule",
+  baseUrl: "https://aivee.xyz",
+  url: "https://l.aivee.xyz",
+};

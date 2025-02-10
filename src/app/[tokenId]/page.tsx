@@ -16,7 +16,7 @@ import WeeklyView from "@/components/WeeklyView";
 import { cn } from "@/lib/utils";
 import ReservationDialog from "@/components/ReservationDialog";
 import LoadingPage from "@/app/[tokenId]/Loading";
-import {CalendarViewType} from "@/types/calendar";
+import { CalendarViewType } from "@/types/calendar";
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -72,7 +72,12 @@ export default function HomePage() {
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
 
-        const availabilityData = transformDates(await response.json());
+        const responseData = await response.json();
+        console.log(responseData);
+        const availabilityData = transformDates(responseData);
+        console.log(availabilityData.beginDate);
+        console.log(availabilityData.endDate);
+        console.log(availabilityData.availabilities);
 
         if (mounted) {
           setAvailabilityData(availabilityData);

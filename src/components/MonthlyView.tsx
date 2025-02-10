@@ -20,7 +20,7 @@ export default function MonthlyView({
   selectSlot,
 }: CalendarViewProps) {
   return (
-    <div className="w-full max-w-full flex flex-col items-center gap-5">
+    <div className="w-full max-w-full flex flex-col items-center">
       <div className="w-full max-w-5xl md:h-[480px] bg-subtle flex flex-col md:flex-row md:rounded-lg md:border border-border overflow-hidden">
         <div className="md:w-[240px] lg:w-[280px] shrink-0 md:border-r border-border">
           <InfoPanel />

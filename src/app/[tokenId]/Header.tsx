@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getWeekRange } from "@/util/date";
 import CalendarStyleTabs from "@/components/common/CalendarStyleTabs";
 import OverlaySwitch from "@/components/common/OverlaySwitch";
-import {CalendarViewType} from "@/types/calendar";
+import { CalendarViewType } from "@/types/calendar";
 
 interface HeaderProps {
   view: CalendarViewType;

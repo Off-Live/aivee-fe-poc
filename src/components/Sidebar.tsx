@@ -21,7 +21,8 @@ export default function Sidebar({ selectedDate, onDateChange }: SidebarProps) {
           />
         </div>
       </ScrollArea>
-      <div className="flex justify-center py-8">
+
+      <div className="flex justify-center">
         <AiveeLogoLink />
       </div>
     </div>

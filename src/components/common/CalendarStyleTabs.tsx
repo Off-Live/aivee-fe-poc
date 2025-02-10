@@ -3,7 +3,7 @@
 import React from "react";
 import { FaCalendarAlt, FaTh } from "react-icons/fa";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {CalendarViewType} from "@/types/calendar";
+import { CalendarViewType } from "@/types/calendar";
 
 type Props = {
   currentView: CalendarViewType;

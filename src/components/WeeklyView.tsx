@@ -176,13 +176,15 @@ export default function WeeklyView({
       >
         <TimeAxis width={timeAxisWidth} cellHeight={cellHeight}>
           <div
-            className="absolute right-0 flex items-center pr-2"
+            className="absolute right-0 flex items-center pr-0"
             style={{
               top: `${currentTimePos}px`,
               transform: "translateY(-50%)",
             }}
           >
-            <span className="text-xs text-main font-bold">{currentTime}</span>
+            <span className="text-xs font-semibold bg-main text-text rounded-md px-1 py-0.5">
+              {currentTime}
+            </span>
           </div>
         </TimeAxis>
         <TimeGrid cellWidth={cellWidth} cellHeight={cellHeight}>
