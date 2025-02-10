@@ -1,7 +1,7 @@
 'use client';
 
-import { Calendar, Globe, Loader2 } from 'lucide-react';
-import moment from 'moment';
+import { Calendar, Clock, Globe, Loader2 } from 'lucide-react';
+import moment from 'moment-timezone';
 import { ReactNode, useState } from 'react';
 
 import { useReservationForm } from '@/hooks/useReservationForm';
@@ -23,6 +23,7 @@ import { useTimezone } from '@/context/TimezoneContext';
 import { reservationService } from '@/services/reservation';
 import { TimeSlot } from '@/util/availability';
 import { createAiveeSignature } from '@/util/signature';
+import { formatTimezoneAbbr } from '@/util/timezone';
 
 import { ReservationFormData, ReservationParams } from '@/types/reservation';
 
@@ -98,7 +99,7 @@ const ReservationDialog = ({
         <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
             <DialogTitle>Confirm your details</DialogTitle>
-            <div className='flex flex-col md:flex-row gap-x-2 gap-y-1 pt-3'>
+            <div className='flex flex-col md:flex-col gap-x-2 gap-y-1 pt-3'>
               <div>
                 <span className='inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm'>
                   <Calendar size={14} />
@@ -110,6 +111,12 @@ const ReservationDialog = ({
               <div>
                 <span className='inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm'>
                   <Globe size={14} />
+                  {formatTimezoneAbbr(selectedTimezone)}
+                </span>
+              </div>
+              <div>
+                <span className='inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm'>
+                  <Clock size={14} />
                   {availabilityData?.slotDuration}m
                 </span>
               </div>

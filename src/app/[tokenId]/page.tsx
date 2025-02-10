@@ -89,7 +89,8 @@ export default function HomePage() {
           setAuthorized(true);
           setSelectedDate(availabilityData.beginDate);
         }
-      } catch (_) {
+      } catch (error) {
+        console.error(error)
         if (mounted) {
           setInitLoading(false);
           setAuthorized(false);

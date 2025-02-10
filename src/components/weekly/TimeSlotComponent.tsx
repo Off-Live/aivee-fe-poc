@@ -1,9 +1,10 @@
 'use client';
 // components/weekly/TimeSlotComponent.tsx
 
-import { format } from 'date-fns';
+import moment from 'moment-timezone';
 import { CSSProperties, MouseEvent } from 'react';
 
+import { useTimezone } from '@/context/TimezoneContext';
 import { TimeSlot } from '@/util/availability';
 
 interface TimeSlotProps {
@@ -19,13 +20,17 @@ export function TimeSlotComponent({
   onClick,
   isBlocked,
 }: TimeSlotProps) {
+  const { selectedTimezone } = useTimezone();
+
   const handleClick = (_: MouseEvent<HTMLDivElement>) => {
     if (!isBlocked && onClick) {
       onClick();
     }
   };
 
-  const timeString = format(slot.startDate, 'h:mm a');
+  const timeString = moment
+    .tz(slot.startDate, selectedTimezone)
+    .format('h:mm a');
 
   return (
     <div
