@@ -104,8 +104,13 @@ export default function WeeklyView({
     if (dayIndex === -1) return null;
 
     const startMinutes = startMoment.hours() * 60 + startMoment.minutes();
-    const endMinutes = endMoment.hours() * 60 + endMoment.minutes();
+    let endMinutes = endMoment.hours() * 60 + endMoment.minutes();
 
+    if (endMinutes<startMinutes) {
+      endMinutes += 1440
+      if (endMinutes > 1470) endMinutes = 1470
+    }
+    
     return {
       left: `${dayIndex * cellWidth}px`,
       top: `${(startMinutes / 60 + 0.5) * cellHeight}px`,
