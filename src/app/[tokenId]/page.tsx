@@ -1,22 +1,26 @@
-"use client";
+'use client';
 // app/[tokenId]/page.tsx
 
-import { useAuth } from "@/context/AuthContext";
-import { useAvailability } from "@/context/AvailabilityContext";
-import { useMonthlyEvents } from "@/util/calendar";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { transformDates } from "@/util/availability";
-import MonthlyView from "@/components/MonthlyView";
-import { AIVEE_BACKEND_URL } from "@/config/config";
-import NotFound from "@/app/[tokenId]/NotFound";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/app/[tokenId]/Header";
-import WeeklyView from "@/components/WeeklyView";
-import { cn } from "@/lib/utils";
-import ReservationDialog from "@/components/ReservationDialog";
-import LoadingPage from "@/app/[tokenId]/Loading";
-import { CalendarViewType } from "@/types/calendar";
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { cn } from '@/lib/utils';
+
+import MonthlyView from '@/components/MonthlyView';
+import ReservationDialog from '@/components/ReservationDialog';
+import Sidebar from '@/components/Sidebar';
+import WeeklyView from '@/components/WeeklyView';
+
+import Header from '@/app/[tokenId]/Header';
+import LoadingPage from '@/app/[tokenId]/Loading';
+import NotFound from '@/app/[tokenId]/NotFound';
+import { AIVEE_BACKEND_URL } from '@/config/config';
+import { useAuth } from '@/context/AuthContext';
+import { useAvailability } from '@/context/AvailabilityContext';
+import { transformDates } from '@/util/availability';
+import { useMonthlyEvents } from '@/util/calendar';
+
+import { CalendarViewType } from '@/types/calendar';
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -25,7 +29,7 @@ export default function HomePage() {
     endDate: new Date(),
   });
   const [showGuestCalendar, setShowGuestCalendar] = useState(false);
-  const [view, setView] = useState<CalendarViewType>("monthly");
+  const [view, setView] = useState<CalendarViewType>('monthly');
   const [initLoading, setInitLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -38,27 +42,27 @@ export default function HomePage() {
   );
 
   const param = useParams();
-  const token = param["tokenId"];
+  const token = param['tokenId'];
 
   useEffect(() => {
     const checkMobile = () => {
-      const isMobileView = window.matchMedia("(max-width: 768px)").matches;
+      const isMobileView = window.matchMedia('(max-width: 768px)').matches;
       if (isMobileView) {
-        setView("monthly");
+        setView('monthly');
       }
     };
     checkMobile();
 
-    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
     const handleResize = (e: MediaQueryListEvent) => {
       if (e.matches) {
-        setView("monthly");
+        setView('monthly');
       }
     };
-    mediaQuery.addEventListener("change", handleResize);
+    mediaQuery.addEventListener('change', handleResize);
 
     return () => {
-      mediaQuery.removeEventListener("change", handleResize);
+      mediaQuery.removeEventListener('change', handleResize);
     };
   }, []);
 
@@ -85,7 +89,7 @@ export default function HomePage() {
           setAuthorized(true);
           setSelectedDate(availabilityData.beginDate);
         }
-      } catch (error) {
+      } catch (_) {
         if (mounted) {
           setInitLoading(false);
           setAuthorized(false);
@@ -103,18 +107,18 @@ export default function HomePage() {
   const handleSlotSelect = (start: Date, end: Date) => {
     setSelectedSlot({ startDate: start, endDate: end });
     setOpenDialog(true);
-    console.log("select slot");
+    console.log('select slot');
   };
 
   if (initLoading) return <LoadingPage />;
   if (!authorized) return <NotFound />;
 
   return (
-    <div className="min-h-screen bg-default">
+    <div className='min-h-screen bg-default'>
       <div className={`mx-auto min-h-screen 'max-w-[1800px]'`}>
-        <div className="flex min-h-screen">
-          {view === "monthly" ? null : (
-            <nav className="hidden md:block border-r border-border md:w-[360px] lg:w-[420px] shrink-0">
+        <div className='flex min-h-screen'>
+          {view === 'monthly' ? null : (
+            <nav className='hidden md:block border-r border-border md:w-[360px] lg:w-[420px] shrink-0'>
               <Sidebar
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
@@ -122,7 +126,7 @@ export default function HomePage() {
             </nav>
           )}
 
-          <main className="flex-1 flex flex-col">
+          <main className='flex-1 flex flex-col'>
             <Header
               view={view}
               onChange={setView}
@@ -133,14 +137,14 @@ export default function HomePage() {
             />
 
             {/* CalendarView Container */}
-            <div className="flex-1 flex items-center justify-center">
+            <div className='flex-1 flex items-center justify-center'>
               <div
                 className={cn(
-                  "flex flex-col w-full h-full items-center justify-center",
-                  view === "monthly" ? "max-w-7xl" : "",
+                  'flex flex-col w-full h-full items-center justify-center',
+                  view === 'monthly' ? 'max-w-7xl' : '',
                 )}
               >
-                {view === "monthly" ? (
+                {view === 'monthly' ? (
                   <MonthlyView
                     events={monthlyEvents}
                     selectedDate={selectedDate}

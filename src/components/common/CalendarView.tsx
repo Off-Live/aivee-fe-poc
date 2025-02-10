@@ -1,11 +1,12 @@
 // components/CalendarView.tsx
-"use client";
+'use client';
 
-import { useAvailability } from "@/context/AvailabilityContext";
-import { useTimezone } from "@/context/TimezoneContext";
-import { hasAvailabilityOnDate } from "@/util/availability";
-import React, { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { useAvailability } from '@/context/AvailabilityContext';
+import { useTimezone } from '@/context/TimezoneContext';
+import { hasAvailabilityOnDate } from '@/util/availability';
 
 type CalendarProps = {
   selectedDate: Date;
@@ -17,18 +18,18 @@ export default function CalendarView({
   onDateChange,
 }: CalendarProps) {
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   const { selectedTimezone } = useTimezone();
@@ -73,38 +74,38 @@ export default function CalendarView({
   };
 
   return (
-    <div className="w-full md:p-5 p-5 pb-10">
+    <div className='w-full md:p-5 p-5 pb-10'>
       {/* CalendarView Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-baseline gap-1">
-          <span className="text-text-default text-lg font-medium">
+      <div className='flex justify-between items-center mb-6'>
+        <div className='flex items-baseline gap-1'>
+          <span className='text-text-default text-lg font-medium'>
             {monthNames[month]}
           </span>
-          <span className="text-text-subtle text-md">{year}</span>
+          <span className='text-text-subtle text-md'>{year}</span>
         </div>
 
-        <div className="flex">
+        <div className='flex'>
           <button
             onClick={handlePrevMonth}
-            className="w-9 h-9 flex items-center justify-center rounded-l hover:bg-emphasis"
+            className='w-9 h-9 flex items-center justify-center rounded-l hover:bg-emphasis'
           >
-            <ChevronLeft className="w-4 h-4 text-text-emphasis" />
+            <ChevronLeft className='w-4 h-4 text-text-emphasis' />
           </button>
           <button
             onClick={handleNextMonth}
-            className="w-9 h-9 flex items-center justify-center rounded-r hover:bg-emphasis"
+            className='w-9 h-9 flex items-center justify-center rounded-r hover:bg-emphasis'
           >
-            <ChevronRight className="w-4 h-4 text-text-emphasis" />
+            <ChevronRight className='w-4 h-4 text-text-emphasis' />
           </button>
         </div>
       </div>
 
       {/* Days of Week Header */}
-      <div className="grid grid-cols-7 mb-2">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((dow) => (
+      <div className='grid grid-cols-7 mb-2'>
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dow) => (
           <div
             key={dow}
-            className="text-center text-xs font-medium text-text-default"
+            className='text-center text-xs font-medium text-text-default'
           >
             {dow.toUpperCase()}
           </div>
@@ -112,9 +113,9 @@ export default function CalendarView({
       </div>
 
       {/* Date Cells */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className='grid grid-cols-7 gap-1'>
         {Array.from({ length: firstDayOfMonth }).map((_, idx) => (
-          <div key={`empty-${idx}`} className="aspect-square" />
+          <div key={`empty-${idx}`} className='aspect-square' />
         ))}
 
         {daysArray.map((day) => {
@@ -133,16 +134,16 @@ export default function CalendarView({
               onClick={() => (isAvailable ? handleDayClick(day) : undefined)}
               className={`
                 aspect-square flex items-center justify-center text-sm cursor-pointer rounded-lg relative
-                ${isSelected && "bg-inverted text-text-inverted font-semibold"}
-                ${isAvailable && !isSelected && "bg-emphasis text-text-default hover:border-2 hover:border-border-focus"}
-                ${!isAvailable && "text-text-subtle"}
+                ${isSelected && 'bg-inverted text-text-inverted font-semibold'}
+                ${isAvailable && !isSelected && 'bg-emphasis text-text-default hover:border-2 hover:border-border-focus'}
+                ${!isAvailable && 'text-text-subtle'}
               `}
             >
               <span>{day}</span>
               {isToday(day) && (
                 <div
-                  className={`absolute w-1 h-1 rounded-full ${isSelected ? "bg-text-inverted" : "bg-text-emphasis"}`}
-                  style={{ bottom: "20%" }}
+                  className={`absolute w-1 h-1 rounded-full ${isSelected ? 'bg-text-inverted' : 'bg-text-emphasis'}`}
+                  style={{ bottom: '20%' }}
                 />
               )}
             </div>

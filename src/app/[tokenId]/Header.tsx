@@ -1,10 +1,13 @@
-import { format } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { getWeekRange } from "@/util/date";
-import CalendarStyleTabs from "@/components/common/CalendarStyleTabs";
-import OverlaySwitch from "@/components/common/OverlaySwitch";
-import { CalendarViewType } from "@/types/calendar";
+import { format } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
+import CalendarStyleTabs from '@/components/common/CalendarStyleTabs';
+import OverlaySwitch from '@/components/common/OverlaySwitch';
+
+import { getWeekRange } from '@/util/date';
+
+import { CalendarViewType } from '@/types/calendar';
 
 interface HeaderProps {
   view: CalendarViewType;
@@ -43,24 +46,24 @@ export default function Header({
   };
 
   const formatDateRange = (start: Date, end: Date) => {
-    const startFormat = start.getMonth() === end.getMonth() ? "MMM d" : "MMM d";
-    const endFormat = start.getMonth() === end.getMonth() ? "d" : "MMM d";
+    const startFormat = start.getMonth() === end.getMonth() ? 'MMM d' : 'MMM d';
+    const endFormat = start.getMonth() === end.getMonth() ? 'd' : 'MMM d';
 
     return (
       <h2>
-        <span className="text-text-default text-base">
+        <span className='text-text-default text-base'>
           {format(start, startFormat)}-{format(end, endFormat)}
         </span>
-        <span className="text-text-subtle text-base">
-          {format(end, ", yyyy")}
+        <span className='text-text-subtle text-base'>
+          {format(end, ', yyyy')}
         </span>
       </h2>
     );
   };
 
   return (
-    <header className="py-4 px-6 flex flex-row-reverse">
-      <div className="flex flex-row space-x-4">
+    <header className='py-4 px-6 flex flex-row-reverse'>
+      <div className='flex flex-row space-x-4'>
         <OverlaySwitch
           showGuestCalendar={showGuestCalendar}
           setShowGuestCalendar={setShowGuestCalendar}
@@ -68,24 +71,24 @@ export default function Header({
         <CalendarStyleTabs currentView={view} onChange={onChange} />
       </div>
 
-      {view === "weekly" && (
-        <div className="flex-1 flex items-center">
-          <div className="flex flex-row items-center space-x-4">
+      {view === 'weekly' && (
+        <div className='flex-1 flex items-center'>
+          <div className='flex flex-row items-center space-x-4'>
             {weekDays[0] &&
               weekDays[6] &&
               formatDateRange(weekDays[0], weekDays[6])}
-            <div className="flex">
+            <div className='flex'>
               <button
                 onClick={handlePrevWeek}
-                className="w-9 h-9 flex items-center justify-center rounded-l hover:bg-emphasis"
+                className='w-9 h-9 flex items-center justify-center rounded-l hover:bg-emphasis'
               >
-                <ChevronLeft className="w-4 h-4 text-text-emphasis" />
+                <ChevronLeft className='w-4 h-4 text-text-emphasis' />
               </button>
               <button
                 onClick={handleNextWeek}
-                className="w-9 h-9 flex items-center justify-center rounded-r hover:bg-emphasis"
+                className='w-9 h-9 flex items-center justify-center rounded-r hover:bg-emphasis'
               >
-                <ChevronRight className="w-4 h-4 text-text-emphasis" />
+                <ChevronRight className='w-4 h-4 text-text-emphasis' />
               </button>
             </div>
           </div>

@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useAvailability } from "@/context/AvailabilityContext";
-import { useTimezone } from "@/context/TimezoneContext";
-import { TimeSlot, getAvailableTimeSlotsForDate } from "@/util/availability";
-import { CalendarEvent } from "@/util/calendar";
-import { getWeekRange } from "@/util/date";
-import { DateHeader } from "./weekly/DateHeader";
-import { TimeAxis } from "./weekly/TimeAxis";
-import { TimeGrid } from "./weekly/TimeGrid";
-import { TimeSlotComponent } from "./weekly/TimeSlotComponent";
-import { CalendarEventComponent } from "./weekly/CalendarEvent";
-import moment from "moment-timezone";
+import moment from 'moment-timezone';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
+import { useAvailability } from '@/context/AvailabilityContext';
+import { useTimezone } from '@/context/TimezoneContext';
+import { getAvailableTimeSlotsForDate, TimeSlot } from '@/util/availability';
+import { CalendarEvent } from '@/util/calendar';
+import { getWeekRange } from '@/util/date';
+
+import { CalendarEventComponent } from './weekly/CalendarEvent';
+import { DateHeader } from './weekly/DateHeader';
+import { TimeAxis } from './weekly/TimeAxis';
+import { TimeGrid } from './weekly/TimeGrid';
+import { TimeSlotComponent } from './weekly/TimeSlotComponent';
 
 interface WeeklyViewV3Props {
   events: CalendarEvent[];
@@ -56,8 +58,8 @@ export default function WeeklyView({
     };
 
     updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
   }, []);
 
   useEffect(() => {
@@ -149,16 +151,16 @@ export default function WeeklyView({
   );
 
   const currentTime = useMemo(() => {
-    return moment().tz(selectedTimezone).format("h:mma");
+    return moment().tz(selectedTimezone).format('h:mma');
   }, [selectedTimezone]);
 
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex flex-col bg-default border border-border overflow-hidden"
+      className='w-full h-full flex flex-col bg-default border border-border overflow-hidden'
     >
       <div
-        className="flex flex-row py-2 justify-evenly border-b-2"
+        className='flex flex-row py-2 justify-evenly border-b-2'
         style={{ paddingLeft: timeAxisWidth }}
       >
         {weekDays.map((date) => (
@@ -171,25 +173,25 @@ export default function WeeklyView({
       {/* Scrollable time grid */}
       <div
         ref={scrollContainerRef}
-        className="flex flex-row overflow-y-auto"
+        className='flex flex-row overflow-y-auto'
         style={{ height: `${containerHeight}px` }}
       >
         <TimeAxis width={timeAxisWidth} cellHeight={cellHeight}>
           <div
-            className="absolute right-0 flex items-center pr-0"
+            className='absolute right-0 flex items-center pr-0'
             style={{
               top: `${currentTimePos}px`,
-              transform: "translateY(-50%)",
+              transform: 'translateY(-50%)',
             }}
           >
-            <span className="text-xs font-semibold bg-main text-text rounded-md px-1 py-0.5">
+            <span className='text-xs font-semibold bg-main text-text rounded-md px-1 py-0.5'>
               {currentTime}
             </span>
           </div>
         </TimeAxis>
         <TimeGrid cellWidth={cellWidth} cellHeight={cellHeight}>
           <div
-            className="absolute w-full h-[1.5px] bg-main z-10"
+            className='absolute w-full h-[1.5px] bg-main z-10'
             style={{
               top: `${currentTimePos}px`,
             }}

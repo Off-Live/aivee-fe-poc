@@ -1,6 +1,7 @@
-"use client";
-import { AvailabilityData } from "@/util/availability";
-import React, { createContext, useContext, useState } from "react";
+'use client';
+import React, { createContext, useContext, useState } from 'react';
+
+import { AvailabilityData } from '@/util/availability';
 
 // Context에 저장할 값의 타입
 interface AvailabilityContextProps {
@@ -16,8 +17,8 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [availabilityData, setAvailabilityData] = useState<AvailabilityData>({
-    email: "",
-    name: "",
+    email: '',
+    name: '',
     beginDate: new Date(),
     endDate: new Date(),
     availabilities: [],
@@ -43,7 +44,7 @@ export function useAvailability() {
   const context = useContext(AvailabilityContext);
   if (!context) {
     throw new Error(
-      "useAvailability  must be used within a AvailabilityProvider",
+      'useAvailability  must be used within a AvailabilityProvider',
     );
   }
   return context;

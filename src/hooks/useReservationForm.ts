@@ -1,8 +1,9 @@
 // hooks/useReservationForm.ts
 
-import { User } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { AvailabilityData } from "@/util/availability";
+import { User } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+
+import { AvailabilityData } from '@/util/availability';
 
 export const useReservationForm = (
   user: User | null,
@@ -10,9 +11,9 @@ export const useReservationForm = (
 ) => {
   const [formData, setFormData] = useState({
     summary: `${availabilityData?.slotDuration}min meeting`,
-    name: "",
-    email: "",
-    desc: "",
+    name: '',
+    email: '',
+    desc: '',
   });
 
   useEffect(() => {
@@ -20,8 +21,8 @@ export const useReservationForm = (
       setFormData((prev) => ({
         ...prev,
         summary: `Meeting: ${availabilityData.name} x ${user.displayName}`,
-        email: user.email ?? "",
-        name: user.displayName ?? "",
+        email: user.email ?? '',
+        name: user.displayName ?? '',
       }));
     }
   }, [user, availabilityData.name]);

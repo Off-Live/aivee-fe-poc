@@ -1,4 +1,4 @@
-import moment from "moment-timezone";
+import moment from 'moment-timezone';
 
 export interface TimeSlot {
   startDate: Date;
@@ -53,7 +53,7 @@ export function checkAvailability(
     timezone,
   );
 
-  const targetEndMoment = targetStartMoment.clone().add(30, "minutes");
+  const targetEndMoment = targetStartMoment.clone().add(30, 'minutes');
 
   const targetStart = targetStartMoment.toDate();
   const targetEnd = targetEndMoment.toDate();
@@ -74,9 +74,9 @@ export function splitAvailabilitySlots(
 
     // Continue splitting while we can fit another slot
     while (
-      currentStart.clone().add(slotDuration, "minutes").isSameOrBefore(slotEnd)
+      currentStart.clone().add(slotDuration, 'minutes').isSameOrBefore(slotEnd)
     ) {
-      const splitSlotEnd = currentStart.clone().add(slotDuration, "minutes");
+      const splitSlotEnd = currentStart.clone().add(slotDuration, 'minutes');
 
       splitSlots.push({
         startDate: currentStart.toDate(),
@@ -133,7 +133,7 @@ export function hasAvailabilityOnDate(
     timezone,
   );
 
-  const dayEndMoment = dayStartMoment.clone().add(1, "day");
+  const dayEndMoment = dayStartMoment.clone().add(1, 'day');
 
   const dayStart = dayStartMoment.toDate();
   const dayEnd = dayEndMoment.toDate();

@@ -1,9 +1,11 @@
-"use client";
+'use client';
 
-import React from "react";
-import { FaCalendarAlt, FaTh } from "react-icons/fa";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarViewType } from "@/types/calendar";
+import React from 'react';
+import { FaCalendarAlt, FaTh } from 'react-icons/fa';
+
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+import { CalendarViewType } from '@/types/calendar';
 
 type Props = {
   currentView: CalendarViewType;
@@ -16,18 +18,18 @@ export default function CalendarStyleTabs({ currentView, onChange }: Props) {
   };
 
   return (
-    <div className="hidden sm:block p-1.5">
+    <div className='hidden sm:block p-1.5'>
       <Tabs value={currentView} onValueChange={handleValueChange}>
-        <TabsList className="h-10 bg-muted">
+        <TabsList className='h-10 bg-muted'>
           <TabsTrigger
-            value="monthly"
-            className="h-8 w-9 px-0 data-[state=active]:bg-emphasis"
+            value='monthly'
+            className='h-8 w-9 px-0 data-[state=active]:bg-emphasis'
           >
             <FaCalendarAlt size={14} />
           </TabsTrigger>
           <TabsTrigger
-            value="weekly"
-            className="h-8 w-9 px-0 data-[state=active]:bg-emphasis"
+            value='weekly'
+            className='h-8 w-9 px-0 data-[state=active]:bg-emphasis'
           >
             <FaTh size={14} />
           </TabsTrigger>

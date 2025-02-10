@@ -1,8 +1,8 @@
-"use client";
+'use client';
 // components/weekly/TimeAxis.tsx
 
-import { format } from "date-fns";
-import { ReactNode } from "react";
+import { format } from 'date-fns';
+import { ReactNode } from 'react';
 
 interface TimeAxisProps {
   width: number;
@@ -17,12 +17,12 @@ export function TimeAxis({ width, cellHeight, children }: TimeAxisProps) {
   const formatHour = (hour: number) => {
     const date = new Date();
     date.setHours(hour, 0, 0, 0);
-    return format(date, "ha").toLowerCase();
+    return format(date, 'ha').toLowerCase();
   };
 
   return (
     <div
-      className="relative border-r-[1px] flex-shrink-0"
+      className='relative border-r-[1px] flex-shrink-0'
       style={{
         width: `${width}px`,
         height: `${totalHeight}px`,
@@ -31,10 +31,10 @@ export function TimeAxis({ width, cellHeight, children }: TimeAxisProps) {
       {hours.map((hour) => (
         <div
           key={hour}
-          className="flex items-center justify-end pr-2"
+          className='flex items-center justify-end pr-2'
           style={{ height: `${cellHeight}px` }}
         >
-          <span className="text-xs text-text-subtle">{formatHour(hour)}</span>
+          <span className='text-xs text-text-subtle'>{formatHour(hour)}</span>
         </div>
       ))}
 

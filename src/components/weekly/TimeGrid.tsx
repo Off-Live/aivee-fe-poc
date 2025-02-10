@@ -1,7 +1,7 @@
-"use client";
+'use client';
 // components/weekly/TimeGrid.tsx
 
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 interface TimeGridProps {
   cellWidth: number;
@@ -18,9 +18,9 @@ export function TimeGrid({ cellWidth, cellHeight, children }: TimeGridProps) {
   const totalGridHeight = gridRows.reduce((sum, row) => sum + row.height, 0);
 
   const gridStyle = {
-    display: "grid",
+    display: 'grid',
     gridTemplateColumns: `repeat(7, ${cellWidth}px)`,
-    gridTemplateRows: gridRows.map((row) => `${row.height}px`).join(" "),
+    gridTemplateRows: gridRows.map((row) => `${row.height}px`).join(' '),
     width: `${cellWidth * 7}px`,
     minHeight: `${totalGridHeight}px`,
     backgroundImage: `repeating-linear-gradient(
@@ -30,20 +30,20 @@ export function TimeGrid({ cellWidth, cellHeight, children }: TimeGridProps) {
       var(--bg-emphasis) 4px,
       var(--bg-emphasis) 5px
     )`,
-    backgroundAttachment: "local",
-    backgroundRepeat: "repeat",
-    backgroundColor: "var(--bg-subtle)",
+    backgroundAttachment: 'local',
+    backgroundRepeat: 'repeat',
+    backgroundColor: 'var(--bg-subtle)',
   } as const;
 
   return (
-    <div className="relative bg-subtle" style={gridStyle}>
-      {gridRows.map((row, rowIndex) =>
+    <div className='relative bg-subtle' style={gridStyle}>
+      {gridRows.map((row) =>
         Array(7)
           .fill(0)
           .map((_, dayIndex) => (
             <div
               key={`${row.hour}-${dayIndex}`}
-              className="border-b border-r border-border-subtle first:border-l-0"
+              className='border-b border-r border-border-subtle first:border-l-0'
               style={{
                 height: `${row.height}px`,
               }}

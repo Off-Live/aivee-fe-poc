@@ -1,19 +1,21 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useAuth } from "@/context/AuthContext";
-import Link from "next/link";
-import { AIVEE_HOME_URL } from "@/config/config";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+
+import { AIVEE_HOME_URL } from '@/config/config';
+import { useAuth } from '@/context/AuthContext';
 
 interface OverlaySwitchProps {
   showGuestCalendar: boolean;
@@ -45,41 +47,41 @@ export default function OverlaySwitch({
 
   return (
     <>
-      <div className="flex items-center space-x-2">
+      <div className='flex items-center space-x-2'>
         <Switch
           checked={showGuestCalendar}
           onCheckedChange={handleSwitchChange}
-          className="h-6 w-11 data-[state=checked]:bg-emphasis
+          className='h-6 w-11 data-[state=checked]:bg-emphasis
                      [&>span]:h-4 [&>span]:w-4 [&>span]:bg-inverted
                      [&>span]:dark:bg-inverted
                      [&>span]:translate-x-0.5
-                     data-[state=checked]:[&>span]:translate-x-5"
+                     data-[state=checked]:[&>span]:translate-x-5'
         />
-        <Label className="text-sm text-text-subtle">Overlay my calendar</Label>
+        <Label className='text-sm text-text-subtle'>Overlay my calendar</Label>
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-[480px] bg-default border-border">
-          <DialogHeader className="text-left">
-            <DialogTitle className="text-lg text-inverted ">
+        <DialogContent className='sm:max-w-[480px] bg-default border-border'>
+          <DialogHeader className='text-left'>
+            <DialogTitle className='text-lg text-inverted '>
               Overlay my calendar
             </DialogTitle>
-            <DialogDescription className="text-text-subtle mt-2">
-              By connecting to your calendar, you accept our{" "}
+            <DialogDescription className='text-text-subtle mt-2'>
+              By connecting to your calendar, you accept our{' '}
               <Link
                 href={`${AIVEE_HOME_URL}/privacy-policy`}
-                className="text-inverted hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
+                className='text-inverted hover:underline'
+                target='_blank'
+                rel='noopener noreferrer'
               >
                 privacy policy
-              </Link>{" "}
-              and{" "}
+              </Link>{' '}
+              and{' '}
               <Link
                 href={`${AIVEE_HOME_URL}/terms-of-use`}
-                className="text-inverted hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
+                className='text-inverted hover:underline'
+                target='_blank'
+                rel='noopener noreferrer'
               >
                 terms of use
               </Link>
@@ -87,11 +89,11 @@ export default function OverlaySwitch({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="mt-8">
+          <div className='mt-8'>
             <button
-              className="w-full flex items-center justify-center gap-2 h-9 px-3
+              className='w-full flex items-center justify-center gap-2 h-9 px-3
                        bg-inverted bg-opacity-85 text-text-inverted rounded-md
-                       transition-colors hover:bg-emphasis/80"
+                       transition-colors hover:bg-emphasis/80'
               onClick={() => {
                 signInWithGoogle();
                 setShowDialog(false);
@@ -99,8 +101,8 @@ export default function OverlaySwitch({
               }}
             >
               <Image
-                src="/google.svg"
-                alt="Google"
+                src='/google.svg'
+                alt='Google'
                 width={16}
                 height={16}
                 priority

@@ -4,5 +4,5 @@ export const formatDefaultEventSummary = (
   userName: string,
   hostName: string,
 ) => {
-  return `${summary} : ${userName?.split(" ")[0]} x ${hostName.split(" ")[0]}`;
+  return `${summary} : ${userName?.split(' ')[0]} x ${hostName.split(' ')[0]}`;
 };

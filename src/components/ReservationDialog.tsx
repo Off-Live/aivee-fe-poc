@@ -1,26 +1,30 @@
-"use client";
+'use client';
 
-import { ReactNode, useState } from "react";
-import { TimeSlot } from "@/util/availability";
-import { useAuth } from "@/context/AuthContext";
-import { useAvailability } from "@/context/AvailabilityContext";
-import { useTimezone } from "@/context/TimezoneContext";
-import moment from "moment";
+import { Calendar, Globe, Loader2 } from 'lucide-react';
+import moment from 'moment';
+import { ReactNode, useState } from 'react';
+
+import { useReservationForm } from '@/hooks/useReservationForm';
+
+import ConfirmationDialog from '@/components/ConfirmationDialog';
+import ReservationFormFields from '@/components/reservation/ReservationFormFields';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Calendar, Globe, Loader2 } from "lucide-react";
-import { useReservationForm } from "@/hooks/useReservationForm";
-import { reservationService } from "@/services/reservation";
-import ReservationFormFields from "@/components/reservation/ReservationFormFields";
-import { ReservationFormData, ReservationParams } from "@/types/reservation";
-import { createAiveeSignature } from "@/util/signature";
-import ConfirmationDialog from "@/components/ConfirmationDialog";
+} from '@/components/ui/dialog';
+
+import { useAuth } from '@/context/AuthContext';
+import { useAvailability } from '@/context/AvailabilityContext';
+import { useTimezone } from '@/context/TimezoneContext';
+import { reservationService } from '@/services/reservation';
+import { TimeSlot } from '@/util/availability';
+import { createAiveeSignature } from '@/util/signature';
+
+import { ReservationFormData, ReservationParams } from '@/types/reservation';
 
 interface ReservationDialogProps {
   open: boolean;
@@ -69,7 +73,7 @@ const ReservationDialog = ({
       onOpenChange(false);
       setShowConfirmation(true);
     } catch (error) {
-      console.error("[Reservation Error]", error);
+      console.error('[Reservation Error]', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -79,8 +83,8 @@ const ReservationDialog = ({
     setShowConfirmation(false);
     setFormData((prev) => ({
       ...prev,
-      summary: "",
-      desc: "",
+      summary: '',
+      desc: '',
     }));
   };
 
@@ -91,20 +95,20 @@ const ReservationDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
             <DialogTitle>Confirm your details</DialogTitle>
-            <div className="flex flex-col md:flex-row gap-x-2 gap-y-1 pt-3">
+            <div className='flex flex-col md:flex-row gap-x-2 gap-y-1 pt-3'>
               <div>
-                <span className="inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm">
+                <span className='inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm'>
                   <Calendar size={14} />
                   {moment
                     .tz(selectedSlot.startDate, selectedTimezone)
-                    .format("ddd, MMM D, YYYY, h:mm a")}
+                    .format('ddd, MMM D, YYYY, h:mm a')}
                 </span>
               </div>
               <div>
-                <span className="inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm">
+                <span className='inline-flex items-center gap-1 bg-emphasis rounded px-1 py-0.5 text-sm'>
                   <Globe size={14} />
                   {availabilityData?.slotDuration}m
                 </span>
@@ -112,7 +116,7 @@ const ReservationDialog = ({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6 pt-6">
+          <form onSubmit={handleSubmit} className='space-y-6 pt-6'>
             <ReservationFormFields
               formData={formData}
               setFormData={setFormData}
@@ -121,23 +125,23 @@ const ReservationDialog = ({
 
             <DialogFooter>
               <Button
-                variant="ghost"
-                type="button"
-                className="text-text-subtle"
+                variant='ghost'
+                type='button'
+                className='text-text-subtle'
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
                 Back
               </Button>
               <Button
-                type="submit"
-                className="w-[90px]"
+                type='submit'
+                className='w-[90px]'
                 disabled={isSubmitting}
               >
                 {
                   (isSubmitting ? (
-                    <div className="flex items-center">
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <div className='flex items-center'>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                       <span>Loading</span>
                     </div>
                   ) : (

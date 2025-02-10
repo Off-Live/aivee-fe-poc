@@ -1,8 +1,9 @@
 // components/Sidebar.tsx
-import { ScrollArea } from "@/components/ui/scroll-area";
-import InfoPanel from "./common/InfoPanel";
-import CalendarView from "./common/CalendarView";
-import AiveeLogoLink from "@/components/common/AiveeLogoLink";
+import AiveeLogoLink from '@/components/common/AiveeLogoLink';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+import CalendarView from './common/CalendarView';
+import InfoPanel from './common/InfoPanel';
 
 type SidebarProps = {
   selectedDate: Date;
@@ -11,9 +12,9 @@ type SidebarProps = {
 
 export default function Sidebar({ selectedDate, onDateChange }: SidebarProps) {
   return (
-    <div className="h-full flex flex-col">
-      <ScrollArea className="flex-1">
-        <div className="space-y-4 py-2">
+    <div className='h-full flex flex-col'>
+      <ScrollArea className='flex-1'>
+        <div className='space-y-4 py-2'>
           <InfoPanel />
           <CalendarView
             selectedDate={selectedDate}
@@ -22,7 +23,7 @@ export default function Sidebar({ selectedDate, onDateChange }: SidebarProps) {
         </div>
       </ScrollArea>
 
-      <div className="flex justify-center">
+      <div className='flex justify-center'>
         <AiveeLogoLink />
       </div>
     </div>

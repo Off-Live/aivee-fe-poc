@@ -1,5 +1,5 @@
 // utils/calendarApi.ts
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export interface CalendarEvent {
   id: string;
@@ -46,14 +46,14 @@ export const fetchCalendarEvents = async (
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch calendar events");
+      throw new Error('Failed to fetch calendar events');
     }
 
     const data: CalendarResponse = await response.json();
     //console.log('CalendarView Events:', data.items);
     return data.items;
   } catch (error) {
-    console.error("Error fetching calendar events:", error);
+    console.error('Error fetching calendar events:', error);
     throw error;
   }
 };
@@ -98,7 +98,7 @@ export function useWeeklyEvents(
         );
         setWeeklyEvents(events);
       } catch (error) {
-        console.error("Failed to fetch weekly events:", error);
+        console.error('Failed to fetch weekly events:', error);
       } finally {
         setLoading(false);
       }
@@ -149,7 +149,7 @@ export function useMonthlyEvents(
         );
         setMonthlyEvents(events);
       } catch (error) {
-        console.error("Failed to fetch monthly events:", error);
+        console.error('Failed to fetch monthly events:', error);
       } finally {
         setLoading(false);
       }

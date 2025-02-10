@@ -1,8 +1,8 @@
-"use client";
+'use client';
 // TimezoneContext.tsx
 
-import React, { createContext, useContext, useState } from "react";
-import moment from "moment-timezone";
+import moment from 'moment-timezone';
+import React, { createContext, useContext, useState } from 'react';
 
 // Context에 저장할 값의 타입
 interface TimezoneContextProps {
@@ -41,7 +41,7 @@ export const TimezoneProvider: React.FC<{ children: React.ReactNode }> = ({
 export function useTimezone() {
   const context = useContext(TimezoneContext);
   if (!context) {
-    throw new Error("useTimezone must be used within a TimezoneProvider");
+    throw new Error('useTimezone must be used within a TimezoneProvider');
   }
   return context;
 }

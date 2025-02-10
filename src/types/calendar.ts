@@ -1,1 +1,1 @@
-export type CalendarViewType = "monthly" | "weekly";
+export type CalendarViewType = 'monthly' | 'weekly';
