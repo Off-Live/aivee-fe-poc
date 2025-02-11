@@ -5,10 +5,12 @@ export interface CalendarEvent {
   id: string;
   summary: string;
   start: {
+    date: string;
     dateTime: string;
     timeZone: string;
   };
   end: {
+    date: string;
     dateTime: string;
     timeZone: string;
   };
@@ -23,24 +25,24 @@ interface CalendarResponse {
 
 export const fetchCalendarEvents = async (
   accessToken: string,
-  startDate: Date = new Date(),  
-  endDate?: Date  
+  startDate: Date = new Date(),
+  endDate?: Date,
 ): Promise<CalendarEvent[]> => {
   try {
     // Set endDate to 30 days after startDate if endDate is not given.
     const timeMin = startDate.toISOString();
-    const timeMax = endDate 
-      ? endDate.toISOString() 
-      : new Date(startDate.getTime() + (30 * 24 * 60 * 60 * 1000)).toISOString();
+    const timeMax = endDate
+      ? endDate.toISOString()
+      : new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Call Google Calendar API
+    // Call Google CalendarView API
     const response = await fetch(
       `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&timeMax=${timeMax}&orderBy=startTime&singleEvents=true`,
       {
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -48,14 +50,13 @@ export const fetchCalendarEvents = async (
     }
 
     const data: CalendarResponse = await response.json();
-    //console.log('Calendar Events:', data.items);
+    //console.log('CalendarView Events:', data.items);
     return data.items;
   } catch (error) {
     console.error('Error fetching calendar events:', error);
     throw error;
   }
 };
-
 
 export function getStartOfWeek(date: Date) {
   const copy = new Date(date);
@@ -75,7 +76,10 @@ export function getEndOfWeek(date: Date) {
   return copy;
 }
 
-export function useWeeklyEvents(credential: string | undefined, selectedDate: Date) {
+export function useWeeklyEvents(
+  credential: string | undefined,
+  selectedDate: Date,
+) {
   const [weeklyEvents, setWeeklyEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -87,7 +91,11 @@ export function useWeeklyEvents(credential: string | undefined, selectedDate: Da
       try {
         const startOfWeek = getStartOfWeek(selectedDate);
         const endOfWeek = getEndOfWeek(selectedDate);
-        const events = await fetchCalendarEvents(credential, startOfWeek, endOfWeek);
+        const events = await fetchCalendarEvents(
+          credential,
+          startOfWeek,
+          endOfWeek,
+        );
         setWeeklyEvents(events);
       } catch (error) {
         console.error('Failed to fetch weekly events:', error);
@@ -111,17 +119,21 @@ export function getEndOfMonth(date: Date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
 }
 
-export function useMonthlyEvents(credential: string | undefined, selectedDate: Date) {
+export function useMonthlyEvents(
+  credential: string | undefined,
+  selectedDate: Date,
+) {
   const [monthlyEvents, setMonthlyEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
-  const [fetchStart, setFetchStart] = useState<Date>(getStartOfMonth(selectedDate))
-  const [fetchEnd, setFetchEnd ] = useState<Date>(getEndOfMonth(selectedDate))
-
+  const [fetchStart, setFetchStart] = useState<Date>(
+    getStartOfMonth(selectedDate),
+  );
+  const [fetchEnd, setFetchEnd] = useState<Date>(getEndOfMonth(selectedDate));
 
   useEffect(() => {
-    setFetchStart(getStartOfWeek(getStartOfMonth(selectedDate)))
-    setFetchEnd(getEndOfWeek(getEndOfMonth(selectedDate)))
-  }, [selectedDate])
+    setFetchStart(getStartOfWeek(getStartOfMonth(selectedDate)));
+    setFetchEnd(getEndOfWeek(getEndOfMonth(selectedDate)));
+  }, [selectedDate]);
 
   useEffect(() => {
     if (!credential) return;
@@ -129,8 +141,12 @@ export function useMonthlyEvents(credential: string | undefined, selectedDate: D
     const loadMonthlyEvents = async () => {
       setLoading(true);
       try {
-        console.log(fetchStart, fetchEnd)
-        const events = await fetchCalendarEvents(credential, fetchStart, fetchEnd);
+        console.log(fetchStart, fetchEnd);
+        const events = await fetchCalendarEvents(
+          credential,
+          fetchStart,
+          fetchEnd,
+        );
         setMonthlyEvents(events);
       } catch (error) {
         console.error('Failed to fetch monthly events:', error);

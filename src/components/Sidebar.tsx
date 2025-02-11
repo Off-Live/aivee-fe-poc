@@ -1,36 +1,31 @@
-
 // components/Sidebar.tsx
-import { TimeSlot } from '@/util/availability';
-import React from 'react';
-import Calendar from './Calendar';
-import TimezoneSelector from './TimezoneSelector';
+import AiveeLogoLink from '@/components/common/AiveeLogoLink';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+import CalendarView from './common/CalendarView';
+import InfoPanel from './common/InfoPanel';
 
 type SidebarProps = {
-  selectedDate: Date;              
-  availability: TimeSlot[];
-  email:string;
-  name:string;
-  onDateChange: (date: Date) => void;   
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
 };
 
-
-export default function Sidebar({ selectedDate, availability,email,name, onDateChange }: SidebarProps) {
+export default function Sidebar({ selectedDate, onDateChange }: SidebarProps) {
   return (
-    <div className = "sidebar">
-      
-      <h2 style={{ margin: '8px 0' }}>{name}</h2>
-      <h3 style={{ margin: '8px 0' }}>Available slots</h3>
-      
-      <TimezoneSelector/>
+    <div className='h-full flex flex-col'>
+      <ScrollArea className='flex-1'>
+        <div className='space-y-4 py-2'>
+          <InfoPanel />
+          <CalendarView
+            selectedDate={selectedDate}
+            onDateChange={onDateChange}
+          />
+        </div>
+      </ScrollArea>
 
-      <Calendar
-       
-       selectedDate={selectedDate}
-       availability={availability}
-       onDateChange={onDateChange}
-       width={340}
-      />
-      
+      <div className='flex justify-center'>
+        <AiveeLogoLink />
+      </div>
     </div>
   );
 }

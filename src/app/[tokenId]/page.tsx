@@ -1,138 +1,177 @@
-// app/page.tsx
 'use client';
+// app/[tokenId]/page.tsx
 
-import InfoPanel from '@/components/InfoPanel';
-import Calendar from '@/components/Calendar';
-import TimeSlots from '@/components/TimeSlots';
-import ViewToggle from '@/components/ViewToggle';
-import WeeklyView from '@/components/WeeklyView';
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useMonthlyEvents } from '@/util/calendar';
 import { useParams } from 'next/navigation';
-import ModalForm from '@/components/ModalForm';
-import { AvailabilityResponse, TimeSlot, transformDates } from '@/util/availability';
-import Sidebar from '@/components/Sidebar';
-import GoogleAuth from '@/components/GoogleAuth';
-import moment from "moment-timezone";
+import { useEffect, useState } from 'react';
 
-interface HostInfo{
-  email:string;
-  name:string;
-}
+import { cn } from '@/lib/utils';
+
+import MonthlyView from '@/components/MonthlyView';
+import ReservationDialog from '@/components/ReservationDialog';
+import Sidebar from '@/components/Sidebar';
+import WeeklyView from '@/components/WeeklyView';
+
+import Header from '@/app/[tokenId]/Header';
+import LoadingPage from '@/app/[tokenId]/Loading';
+import NotFound from '@/app/[tokenId]/NotFound';
+import { AIVEE_BACKEND_URL } from '@/config/config';
+import { useAuth } from '@/context/AuthContext';
+import { useAvailability } from '@/context/AvailabilityContext';
+import { transformDates } from '@/util/availability';
+import { useMonthlyEvents } from '@/util/calendar';
+
+import { CalendarViewType } from '@/types/calendar';
 
 export default function HomePage() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [selectedSlot, setSelectedSlot] = useState<TimeSlot>({ startDate: new Date(), endDate: new Date() })
-  const [view, setView] = useState<'monthly' | 'weekly'>('monthly');
-  const [initLoading, setInitLoading] = useState(true)
-  const [authorized, setAuthorized] = useState(false)
-  const [availability, setAvailability] = useState<TimeSlot[]>([])
-  const [showModal, setShowModal] = useState(false);
-  const [hostInfo,setHostInfo] = useState<HostInfo>({email:"",name:""})
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedSlot, setSelectedSlot] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+  const [showGuestCalendar, setShowGuestCalendar] = useState(false);
+  const [view, setView] = useState<CalendarViewType>('monthly');
+  const [initLoading, setInitLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const { credential } = useAuth();
-  const { monthlyEvents, loading } = useMonthlyEvents(credential?.accessToken, selectedDate)
+  const { setAvailabilityData } = useAvailability();
+  const { monthlyEvents, loading } = useMonthlyEvents(
+    credential?.accessToken,
+    selectedDate,
+  );
 
   const param = useParams();
-  const token = param['tokenId']
+  const token = param['tokenId'];
 
   useEffect(() => {
-    const getAvailabilitySlots = async () => {
+    const checkMobile = () => {
+      const isMobileView = window.matchMedia('(max-width: 768px)').matches;
+      if (isMobileView) {
+        setView('monthly');
+      }
+    };
+    checkMobile();
+
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleResize = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setView('monthly');
+      }
+    };
+    mediaQuery.addEventListener('change', handleResize);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchAvailability = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_AIVEE_BACKEND}/availability/slots?token=${token}`)
-        if (!response.ok) {
+        const response = await fetch(
+          `${AIVEE_BACKEND_URL}/availability/slots?token=${token}`,
+        );
+        if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
 
+        const responseData = await response.json();
+        console.log(responseData);
+        const availabilityData = transformDates(responseData);
+        console.log(availabilityData.beginDate);
+        console.log(availabilityData.endDate);
+        console.log(availabilityData.availabilities);
+
+        if (mounted) {
+          setAvailabilityData(availabilityData);
+          setInitLoading(false);
+          setAuthorized(true);
+          setSelectedDate(availabilityData.beginDate);
         }
-
-        const json = await response.json()
-        const availabilityData = transformDates(json as AvailabilityResponse);
-        console.log(availabilityData.availabilities)
-
-        setAvailability(availabilityData.availabilities)
-        setInitLoading(false)
-        setAuthorized(true)
-        setSelectedDate(availabilityData.beginDate)
-        setHostInfo({email:availabilityData.email, name:availabilityData.name})
       } catch (error) {
-        setInitLoading(false)
-        setAuthorized(false)
+        console.error(error)
+        if (mounted) {
+          setInitLoading(false);
+          setAuthorized(false);
+        }
       }
+    };
 
-    }
-    
+    fetchAvailability();
 
-    getAvailabilitySlots()
+    return () => {
+      mounted = false; // cleanup
+    };
+  }, [token, setAvailabilityData]);
 
-  }, [param, token])
+  const handleSlotSelect = (start: Date, end: Date) => {
+    setSelectedSlot({ startDate: start, endDate: end });
+    setOpenDialog(true);
+    console.log('select slot');
+  };
 
-  const selectSlot = (start: Date, end: Date) => {
-    setSelectedSlot({ startDate: start, endDate: end })
-    setShowModal(true)
-    console.log("select slot")
-  }
-
-  const authorizedMain = <>
-
-    <div style={{ position: 'absolute', top: '24px', right: '150px' }}>
-      <GoogleAuth/>
-    </div>
-    
-    <div style={{ position: 'absolute', top: '24px', right: '24px' }}>
-      <ViewToggle currentView={view} onChange={(v) => setView(v)} />
-    </div>
-
-
-    {view === 'monthly' ? (
-      <>
-        
-        <div className="calendarWrapper">
-          <InfoPanel email={hostInfo.email} name={hostInfo.name}/>
-          <Calendar
-            selectedDate={selectedDate}
-            availability={availability}
-            onDateChange={(date) => setSelectedDate(date)}
-          />
-          <TimeSlots selectedDate={selectedDate} availability={availability} selectSlot={selectSlot} />
-        </div>
-      </>
-    ) : (
-      <>
-        <h1>Weekly View</h1>
-        <WeeklyView events={monthlyEvents} currentDate={selectedDate} availability={availability} setCurrentDate={setSelectedDate} selectSlot={selectSlot} />
-      </>
-    )}
-  </>
-
-  const unauthorizedMain = "Not valid token"
-  const loadingScreen = "loading"
-
-  const content = initLoading ? loadingScreen : (authorized ? authorizedMain : unauthorizedMain)
-
+  if (initLoading) return <LoadingPage />;
+  if (!authorized) return <NotFound />;
 
   return (
-    <div className="container">
-      {
-        view === 'monthly' ? null : (
-        <Sidebar  selectedDate={selectedDate}
-          availability={availability}
-          email={hostInfo.email} name={hostInfo.name}
-          onDateChange={(date) => setSelectedDate(date)}
-          />)
-      }
-      
-      <div className="main">
-        {content}
+    <div className='min-h-screen bg-default'>
+      <div className={`mx-auto min-h-screen 'max-w-[1800px]'`}>
+        <div className='flex min-h-screen'>
+          {view === 'monthly' ? null : (
+            <nav className='hidden md:block border-r border-border md:w-[360px] lg:w-[420px] shrink-0'>
+              <Sidebar
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+              />
+            </nav>
+          )}
 
+          <main className='flex-1 flex flex-col'>
+            <Header
+              view={view}
+              onChange={setView}
+              currentDate={selectedDate}
+              setCurrentDate={setSelectedDate}
+              showGuestCalendar={showGuestCalendar}
+              setShowGuestCalendar={setShowGuestCalendar}
+            />
+
+            {/* CalendarView Container */}
+            <div className='flex-1 flex items-center justify-center'>
+              <div
+                className={cn(
+                  'flex flex-col w-full h-full items-center justify-center',
+                  view === 'monthly' ? 'max-w-7xl' : '',
+                )}
+              >
+                {view === 'monthly' ? (
+                  <MonthlyView
+                    events={monthlyEvents}
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                    selectSlot={handleSlotSelect}
+                  />
+                ) : (
+                  <WeeklyView
+                    events={monthlyEvents}
+                    currentDate={selectedDate}
+                    selectSlot={handleSlotSelect}
+                    showGuestCalendar={showGuestCalendar}
+                  />
+                )}
+              </div>
+            </div>
+          </main>
+        </div>
+
+        <ReservationDialog
+          open={openDialog}
+          selectedSlot={selectedSlot}
+          token={String(token)}
+          onOpenChange={setOpenDialog}
+        />
       </div>
-
-      <ModalForm show={showModal} selectedSlot={selectedSlot} token={String(token!)} onClose={() => setShowModal(false)} />
-
     </div>
   );
 }
-
-
-
-
