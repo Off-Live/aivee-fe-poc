@@ -3,6 +3,8 @@
 import React from 'react';
 import { FaCalendarAlt, FaTh } from 'react-icons/fa';
 
+import { useAmplitude } from '@/hooks/useAmplitude';
+
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { CalendarViewType } from '@/types/calendar';
@@ -13,8 +15,13 @@ type Props = {
 };
 
 export default function CalendarStyleTabs({ currentView, onChange }: Props) {
+  const { logEvent } = useAmplitude();
+
   const handleValueChange = (value: string) => {
     onChange(value as CalendarViewType);
+    logEvent('Change View', {
+      viewType: value,
+    });
   };
 
   return (

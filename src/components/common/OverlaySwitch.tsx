@@ -4,6 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
+import { useAmplitude } from '@/hooks/useAmplitude';
+
 import {
   Dialog,
   DialogContent,
@@ -15,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
 import { AIVEE_HOME_URL } from '@/config/config';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface OverlaySwitchProps {
   showGuestCalendar: boolean;
@@ -26,6 +28,7 @@ export default function OverlaySwitch({
   showGuestCalendar,
   setShowGuestCalendar,
 }: OverlaySwitchProps) {
+  const { logEvent } = useAmplitude();
   const { user, signInWithGoogle } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,9 +43,13 @@ export default function OverlaySwitch({
   const handleSwitchChange = (checked: boolean) => {
     if (checked && !user) {
       setShowDialog(true);
+      logEvent('Overlay My Calendar', {
+        authenticated: 'false',
+      });
       return;
     }
     setShowGuestCalendar(checked);
+    logEvent(checked ? 'Overlay My Calendar' : 'Disoverlay My Calendar');
   };
 
   return (

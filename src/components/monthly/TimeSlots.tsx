@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { useAvailability } from '@/context/AvailabilityContext';
-import { useTimezone } from '@/context/TimezoneContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { getAvailableTimeSlotsForDate } from '@/util/availability';
 import { CalendarEvent } from '@/util/calendar';
 

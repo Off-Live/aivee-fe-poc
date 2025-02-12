@@ -1,7 +1,9 @@
 import { ChevronDown, Globe } from 'lucide-react';
 import moment from 'moment-timezone';
 import * as React from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+
+import { useAmplitude } from '@/hooks/useAmplitude';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,10 +20,11 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-import { useTimezone } from '@/context/TimezoneContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { formatTimezone, formatTimezoneAbbr } from '@/util/timezone';
 
 const TimezoneSelector = () => {
+  const { logEvent } = useAmplitude();
   const { selectedTimezone, setSelectedTimezone } = useTimezone();
   const [open, setOpen] = React.useState(false);
   const commandGroupRef = useRef<HTMLDivElement | null>(null);
@@ -42,6 +45,15 @@ const TimezoneSelector = () => {
     }
   }, []);
 
+  const handleOpen = useCallback(
+    (value: boolean, newTimezone?: string) => {
+      setOpen(value);
+      const properties: Record<string, string> | undefined = newTimezone ? { timezone: newTimezone } : undefined;
+      logEvent(value ? 'Open Timezone' : 'Close Timezone', properties);
+    },
+    [setOpen, logEvent],
+  );
+
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => {
@@ -57,7 +69,7 @@ const TimezoneSelector = () => {
   }, [open, selectedTimezone]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpen}>
       <PopoverTrigger asChild>
         <Button
           variant='ghost'
@@ -90,7 +102,7 @@ const TimezoneSelector = () => {
                   value={timezone}
                   onSelect={(currentValue) => {
                     setSelectedTimezone(currentValue);
-                    setOpen(false);
+                    handleOpen(false, currentValue);
                   }}
                   className={`cursor-pointer ${
                     timezone === selectedTimezone

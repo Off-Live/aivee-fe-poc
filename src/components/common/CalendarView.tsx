@@ -4,8 +4,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useAvailability } from '@/context/AvailabilityContext';
-import { useTimezone } from '@/context/TimezoneContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { hasAvailabilityOnDate } from '@/util/availability';
 
 type CalendarProps = {

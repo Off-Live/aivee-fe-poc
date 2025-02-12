@@ -1,5 +1,5 @@
 'use client';
-// context/AuthContext.tsx
+// contexts/AuthContext.tsx
 
 import {
   GoogleAuthProvider,
@@ -15,7 +15,7 @@ import { auth } from '@/app/firebase';
 interface AuthContextType {
   user: User | null;
   credential: OAuthCredential | null;
-  loading: boolean;
+  // loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [credential, setCredential] = useState<OAuthCredential | null>(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   // Cannot get credential without logging in again, so I reset the login session when be refreshed
 
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value = {
     user,
-    loading,
+    // loading,
     credential,
     signInWithGoogle,
     logout,

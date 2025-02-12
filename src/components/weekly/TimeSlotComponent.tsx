@@ -4,7 +4,7 @@
 import moment from 'moment-timezone';
 import { CSSProperties, MouseEvent } from 'react';
 
-import { useTimezone } from '@/context/TimezoneContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { TimeSlot } from '@/util/availability';
 
 interface TimeSlotProps {

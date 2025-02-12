@@ -4,7 +4,7 @@ import React from 'react';
 
 import TimezoneSelector from '@/components/common/TimezoneSelector';
 
-import { useAvailability } from '@/context/AvailabilityContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
 
 export default function InfoPanel() {
   const { availabilityData } = useAvailability();

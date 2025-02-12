@@ -8,8 +8,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { useAvailability } from '@/context/AvailabilityContext';
-import { useTimezone } from '@/context/TimezoneContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { TimeSlot } from '@/util/availability';
 import { formatTimezone } from '@/util/timezone';
 
