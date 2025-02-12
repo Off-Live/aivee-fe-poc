@@ -4,6 +4,7 @@ import { Calendar, Clock, Globe, Loader2 } from 'lucide-react';
 import moment from 'moment-timezone';
 import { ReactNode, useState } from 'react';
 
+import { useAmplitude } from '@/hooks/useAmplitude';
 import { useReservationForm } from '@/hooks/useReservationForm';
 
 import ConfirmationDialog from '@/components/ConfirmationDialog';
@@ -17,9 +18,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { useAuth } from '@/context/AuthContext';
-import { useAvailability } from '@/context/AvailabilityContext';
-import { useTimezone } from '@/context/TimezoneContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { reservationService } from '@/services/reservation';
 import { TimeSlot } from '@/util/availability';
 import { createAiveeSignature } from '@/util/signature';
@@ -40,6 +41,7 @@ const ReservationDialog = ({
   token,
   onOpenChange,
 }: ReservationDialogProps) => {
+  const { logEvent } = useAmplitude();
   const { selectedTimezone } = useTimezone();
   const { user } = useAuth();
   const { availabilityData } = useAvailability();
@@ -73,8 +75,22 @@ const ReservationDialog = ({
       await reservationService.makeReservation(params);
       onOpenChange(false);
       setShowConfirmation(true);
-    } catch (error) {
+      logEvent('Create Event', {
+        summary: params.summary,
+        description: params.description,
+        attendees: params.attendees.join(','),
+        startDate: params.startDate,
+        endDate: params.endDate,
+      });
+    } catch (error: unknown) {
       console.error('[Reservation Error]', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'An unknown error occurred';
+
+      logEvent('Fail Event Creation', {
+        error: errorMessage,
+      });
     } finally {
       setIsSubmitting(false);
     }

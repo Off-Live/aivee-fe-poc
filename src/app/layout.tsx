@@ -5,9 +5,10 @@ import { ReactNode, Suspense } from 'react';
 import '../styles/globals.css';
 
 import { siteConfig } from '@/config/config';
-import { AuthProvider } from '@/context/AuthContext';
-import { AvailabilityProvider } from '@/context/AvailabilityContext';
-import { TimezoneProvider } from '@/context/TimezoneContext';
+import { AmplitudeProvider } from '@/contexts/AmplitudeContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { AvailabilityProvider } from '@/contexts/AvailabilityContext';
+import { TimezoneProvider } from '@/contexts/TimezoneContext';
 
 const nunito = Nunito({
   subsets: ['latin'],
@@ -47,13 +48,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body
         className={`${nunito.className} bg-default text-white min-h-screen`}
       >
-        <AvailabilityProvider>
-          <TimezoneProvider>
-            <AuthProvider>
-              <Suspense>{children}</Suspense>
-            </AuthProvider>
-          </TimezoneProvider>
-        </AvailabilityProvider>
+        <AmplitudeProvider>
+          <AvailabilityProvider>
+            <TimezoneProvider>
+              <AuthProvider>
+                <Suspense>{children}</Suspense>
+              </AuthProvider>
+            </TimezoneProvider>
+          </AvailabilityProvider>
+        </AmplitudeProvider>
       </body>
     </html>
   );

@@ -11,6 +11,9 @@ export const FIREBASE_CONFIG = {
 export const AIVEE_BACKEND_URL = process.env.NEXT_PUBLIC_AIVEE_BACKEND || '';
 export const AIVEE_HOME_URL = 'https://aivee.xyz';
 
+export const AMPLITUDE_API_KEY =
+  process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY || '';
+
 export const siteConfig = {
   title: 'Aivee Booking',
   description: 'Aivee, The smartest and fastest way to schedule',

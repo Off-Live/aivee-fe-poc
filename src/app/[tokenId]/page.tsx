@@ -15,8 +15,8 @@ import Header from '@/app/[tokenId]/Header';
 import LoadingPage from '@/app/[tokenId]/Loading';
 import NotFound from '@/app/[tokenId]/NotFound';
 import { AIVEE_BACKEND_URL } from '@/config/config';
-import { useAuth } from '@/context/AuthContext';
-import { useAvailability } from '@/context/AvailabilityContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
 import { transformDates } from '@/util/availability';
 import { useMonthlyEvents } from '@/util/calendar';
 
@@ -90,7 +90,7 @@ export default function HomePage() {
           setSelectedDate(availabilityData.beginDate);
         }
       } catch (error) {
-        console.error(error)
+        console.error(error);
         if (mounted) {
           setInitLoading(false);
           setAuthorized(false);

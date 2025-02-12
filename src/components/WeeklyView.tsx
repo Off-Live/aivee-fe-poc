@@ -3,8 +3,8 @@
 import moment from 'moment-timezone';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useAvailability } from '@/context/AvailabilityContext';
-import { useTimezone } from '@/context/TimezoneContext';
+import { useAvailability } from '@/contexts/AvailabilityContext';
+import { useTimezone } from '@/contexts/TimezoneContext';
 import { getAvailableTimeSlotsForDate, TimeSlot } from '@/util/availability';
 import { CalendarEvent } from '@/util/calendar';
 import { getWeekRange } from '@/util/date';
@@ -108,11 +108,11 @@ export default function WeeklyView({
     const startMinutes = startMoment.hours() * 60 + startMoment.minutes();
     let endMinutes = endMoment.hours() * 60 + endMoment.minutes();
 
-    if (endMinutes<startMinutes) {
-      endMinutes += 1440
-      if (endMinutes > 1470) endMinutes = 1470
+    if (endMinutes < startMinutes) {
+      endMinutes += 1440;
+      if (endMinutes > 1470) endMinutes = 1470;
     }
-    
+
     return {
       left: `${dayIndex * cellWidth}px`,
       top: `${(startMinutes / 60 + 0.5) * cellHeight}px`,
